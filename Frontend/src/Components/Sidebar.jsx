@@ -51,14 +51,14 @@ const Sidebar = ({ username }) => {
               href="#"
               className="flex items-center gap-4 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
             >
-              <RiHome3Line /> Home
+              <RiHome3Line /> Reportes
             </Link>
-            <a
+            <Link to="/residente"
               href="#"
               className="flex items-center gap-4 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
             >
               <RiPassportLine /> Residentes
-            </a>
+            </Link>
 
             <Link
               to="/dashboard"

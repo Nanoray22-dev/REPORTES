@@ -233,16 +233,7 @@ wss.on("connection", (connection, req) => {
 ////////////////////////////////////
 // iniciando la parte del reporte //
 
-// app.post('/report', async (req, res) => {
-//   try {
-//     const { title, description } = req.body;
-//     const newReport = await Report.create({ title, description });
-//     res.status(201).json(newReport);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Error creating report' });
-//   }
-// });
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -339,8 +330,74 @@ app.put("/report/:id", async (req, res) => {
   }
 });
 
+/////////////////////////////////////////////////////////////////
+// iniciando la parte del Usuario (residente o administrador) //
 
 
+// const userRouter = require('./UserRouter.js');
+// app.use('/users', userRouter);
 
+app.get("/users", async (req, res) => {
+  try {
+    const users = await User.find();
+    res.json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching users" });
+  }
+});
+
+
+app.post("/users", async (req, res) => {
+  try {
+    const { username, password, email, address, phone, age, residenceType } = req.body;
+    const newUser = await User.create({ username, password, email, address, phone, age, residenceType });
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error creating user" });
+  }
+});
+
+app.delete("/users/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    await User.findByIdAndDelete(userId);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Error deleting user" });
+  }
+});
+
+app.put("/users/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId; 
+    const { username, password, email, address, phone, age, residenceType } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { username, password, email, address, phone, age, residenceType },
+      { new: true }
+    );
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Error updating user" });
+  }
+});
+
+app.get("/users/:userId", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching user" });
+  }
+});
 
 
