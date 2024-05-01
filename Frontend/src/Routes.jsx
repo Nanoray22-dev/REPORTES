@@ -4,8 +4,9 @@ import InicioDeSession from "./InicioDeSession";
 import { UserContext } from "./UserContext";
 import Chat from "./Chat";
 import Dashboard from "./Components/Dashboard";
+import ReportForm from "./Components/Report/ReportForm";
 // import Navigation from "./Components/Navigation";
-import ReportForm from "./Components/ReportForm";
+
 
 export default function Rutas() {
   const { username } = useContext(UserContext);

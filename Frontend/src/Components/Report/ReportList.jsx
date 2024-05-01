@@ -1,4 +1,4 @@
-import logo from "../../public/logo.png"
+import logo from "../../../public/logo.png"
 
 const ReportList = ({
   report,
@@ -24,7 +24,7 @@ const ReportList = ({
         <div>
           <h3 className="text-lg font-semibold">{report.title}</h3>
           <p className="text-sm text-gray-500">
-            Descripción del reporte: {report.createdBy}
+             Reporte hecho por: {report.createdBy}
           </p>
           <p className="text-sm text-gray-500">
             Fecha: {new Date(report.createdAt).toLocaleDateString()}
