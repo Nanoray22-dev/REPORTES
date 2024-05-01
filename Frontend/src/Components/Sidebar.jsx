@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { UserContext } from "../UserContext";
 import { Link, Outlet } from "react-router-dom";
+import logo from "/logo.png";
 
 const Sidebar = ({ username }) => {
   const { id, setId, setUsername } = useContext(UserContext);
@@ -32,10 +33,10 @@ const Sidebar = ({ username }) => {
         }`}
       >
         {/* Profile */}
-        <div className="flex flex-col items-center justify-center p-8 gap-2 h-[30vh]">
+        <div className="flex flex-col items-center justify-center p-8 gap-2 h-[30vh] ">
           <img
-            src="https://img.freepik.com/foto-gratis/anciano-sonriente-gafas_23-2148740051.jpg"
-            className="w-20 h-20 object-cover rounded-full ring-2 ring-blue-300"
+            src={logo}
+            className="w-24 h-24 object-cover rounded-full ring-2 ring-blue-300 bg-blue-50"
           />
           <h1 className="text-xl text-black font-bold">{username}</h1>
           <p className="bg-primary-100 py-2 px-4 rounded-full text-black">
