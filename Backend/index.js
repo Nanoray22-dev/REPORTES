@@ -70,17 +70,17 @@ app.get("/people", async (req, res) => {
   res.json(users);
 });
 
-app.get("/profile", (req, res) => {
-  const token = req.cookies?.token;
-  if (token) {
-    jwt.verify(token, jwtSecret, {}, (err, userData) => {
-      if (err) throw err;
-      res.json(userData);
-    });
-  } else {
-    res.status(401).json("no token");
-  }
-});
+// app.get("/profile", (req, res) => {
+//   const token = req.cookies?.token;
+//   if (token) {
+//     jwt.verify(token, jwtSecret, {}, (err, userData) => {
+//       if (err) throw err;
+//       res.json(userData);
+//     });
+//   } else {
+//     res.status(401).json("no token");
+//   }
+// });
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -89,7 +89,7 @@ app.post("/login", async (req, res) => {
     const passOk = bcrypt.compareSync(password, foundUser.password);
     if (passOk) {
       jwt.sign(
-        { userId: foundUser._id, username },
+        { userId: foundUser._id, username, role: foundUser.role }, // Incluir el rol del usuario en el payload
         jwtSecret,
         {},
         (err, token) => {
@@ -101,6 +101,7 @@ app.post("/login", async (req, res) => {
     }
   }
 });
+
 
 app.post("/logout", (req, res) => {
   res.cookie("token", "", { sameSite: "none", secure: true }).json("ok");
@@ -351,7 +352,7 @@ app.get("/users", async (req, res) => {
 app.post("/users", async (req, res) => {
   try {
     const { username, password, email, address, phone, age, residenceType } = req.body;
-    const newUser = await User.create({ username, password, email, address, phone, age, residenceType });
+    const newUser = await User.create({ username, password, email, address, phone, age, residenceType, role });
     res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
@@ -359,24 +360,24 @@ app.post("/users", async (req, res) => {
   }
 });
 
-app.delete("/users/:id", async (req, res) => {
-  try {
-    const userId = req.params.id;
-    await User.findByIdAndDelete(userId);
-    res.status(200).json({ message: "User deleted successfully" });
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    res.status(500).json({ error: "Error deleting user" });
-  }
-});
+// app.delete("/users/:id", async (req, res) => {
+//   try {
+//     const userId = req.params.id;
+//     await User.findByIdAndDelete(userId);
+//     res.status(200).json({ message: "User deleted successfully" });
+//   } catch (error) {
+//     console.error("Error deleting user:", error);
+//     res.status(500).json({ error: "Error deleting user" });
+//   }
+// });
 
 app.put("/users/:userId", async (req, res) => {
   try {
     const userId = req.params.userId; 
-    const { username, password, email, address, phone, age, residenceType } = req.body;
+    const { username, password, email, address, phone, age, residenceType,role } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { username, password, email, address, phone, age, residenceType },
+      { username, password, email, address, phone, age, residenceType, role },
       { new: true }
     );
     res.status(200).json(updatedUser);
@@ -399,5 +400,38 @@ app.get("/users/:userId", async (req, res) => {
     res.status(500).json({ error: "Error fetching user" });
   }
 });
+
+const isAdmin = (req, res, next) => {
+  if (!req.user || req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Unauthorized access' });
+  }
+  next();
+};
+
+// app.get("/profile", isAdmin, (req, res) => {
+//   const token = req.cookies?.token;
+//   if (token) {
+//     jwt.verify(token, jwtSecret, {}, (err, userData) => {
+//       if (err) throw err;
+//       res.json(userData);
+//     });
+//   } else {
+//     res.status(401).json("no token");
+//   }
+// });
+
+app.get("/profile", (req, res) => {
+  const token = req.cookies?.token;
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, (err, userData) => {
+      if (err) throw err;
+      res.json(userData);
+    });
+  } else {
+    res.status(401).json("no token");
+  }
+});
+
+
 
 

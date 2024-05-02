@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import EditUserForm from "./UserEditForm";
+import Navigation from "../Navigation";
+import { Link } from "react-router-dom";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
   const [editUserId, setEditUserId] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -19,7 +22,19 @@ const UserTable = () => {
     fetchUsers();
   }, []);
 
+  const openModal = (userId) => {
+    setEditUserId(userId);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setEditUserId(null);
+    setIsModalOpen(false);
+  };
+
   return (
+    <>
+    <Navigation   />
     <div className="container mx-auto">
       <h2 className="text-2xl font-bold mb-4">Lista de Usuarios</h2>
       <table className="min-w-full">
@@ -31,6 +46,8 @@ const UserTable = () => {
             <th className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Phone</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Age</th>
             <th className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Residence Type</th>
+            <th className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">Role</th>
+
             <th className="px-6 py-3 bg-gray-50"></th>
           </tr>
         </thead>
@@ -43,15 +60,23 @@ const UserTable = () => {
               <td className="px-6 py-4 whitespace-no-wrap">{user.phone}</td>
               <td className="px-6 py-4 whitespace-no-wrap">{user.age}</td>
               <td className="px-6 py-4 whitespace-no-wrap">{user.residenceType}</td>
+              <td className="px-6 py-4 whitespace-no-wrap">{user.role}</td>
+
               <td className="px-6 py-4 whitespace-no-wrap">
-                <button onClick={() => setEditUserId(user._id)} className="text-indigo-600 hover:text-indigo-900">Editar</button>
+                <button onClick={() => openModal(user._id)} className="text-indigo-600 hover:text-indigo-900">Editar</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
-      {editUserId && <EditUserForm userId={editUserId} />}
+      {isModalOpen && <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
+        <div className="bg-white p-6 rounded-lg">
+          <button onClick={closeModal} className="absolute  mb-24  ">Cerrar</button>
+          <EditUserForm userId={editUserId} />
+        </div>
+      </div>}
     </div>
+    </>
   );
 };
 
