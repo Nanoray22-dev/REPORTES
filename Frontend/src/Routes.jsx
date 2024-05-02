@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Routes, Route, } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import InicioDeSession from "./InicioDeSession";
 import { UserContext } from "./UserContext";
 import Chat from "./Chat";
@@ -16,7 +16,7 @@ export default function Rutas() {
   if (username) {
     return (
       <Routes>
-        <Route path="/dashboard" element={<Dashboard username={username } />} />
+        <Route path="/dashboard" element={<Dashboard username={username} />} />
         <Route path="/chat" element={<Chat />} />
         <Route path="/reporte" element={<ReportForm />} />
         <Route path="/residente" element={<UserTable />} />

@@ -248,18 +248,59 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const baseUrl = "http://localhost:4040/";
 
+// app.get("/report", async (req, res) => {
+//   try {
+//     const reports = await Report.find().populate("createdBy", "username"); 
+//     const reportsWithUsername = reports.map(report => ({
+//       ...report.toObject(),
+//       createdBy: report.createdBy.username, // Reemplaza el ID del usuario con su nombre de usuario
+//       image: report.image ? `${baseUrl}${report.image}` : null
+//     }));
+//     res.json(reportsWithUsername);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Error fetching reports" });
+//   }
+// });
+
 app.get("/report", async (req, res) => {
   try {
-    const reports = await Report.find().populate("createdBy", "username"); 
-    const reportsWithUsername = reports.map(report => ({
-      ...report.toObject(),
-      createdBy: report.createdBy.username, // Reemplaza el ID del usuario con su nombre de usuario
-      image: report.image ? `${baseUrl}${report.image}` : null
-    }));
-    res.json(reportsWithUsername);
+    // Obtén el usuario desde el token de autenticación
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+
+    // Verifica el rol del usuario
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Si el usuario es administrador, devuelve todos los reportes
+    if (user.role === "admin") {
+      const reports = await Report.find().populate("createdBy", "username");
+      const reportsWithUsername = reports.map(report => ({
+        ...report.toObject(),
+        createdBy: report.createdBy.username,
+        image: report.image ? `${baseUrl}${report.image}` : null
+      }));
+      return res.json(reportsWithUsername);
+    } else {
+      // Si el usuario no es administrador, devuelve solo los reportes creados por ese usuario
+      const reports = await Report.find({ createdBy: userId }).populate("createdBy", "username");
+      const reportsWithUsername = reports.map(report => ({
+        ...report.toObject(),
+        createdBy: report.createdBy.username,
+        image: report.image ? `${baseUrl}${report.image}` : null
+      }));
+      return res.json(reportsWithUsername);
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching reports" });
+    return res.status(500).json({ error: "Error fetching reports" });
   }
 });
 
@@ -315,10 +356,43 @@ app.delete("/report/:id", async (req, res) => {
   }
 });
 
+// app.put("/report/:id", async (req, res) => {
+//   try {
+//     const reportId = req.params.id;
+//     const { title, description, state, incidentDate } = req.body;
+//     const updatedReport = await Report.findByIdAndUpdate(
+//       reportId,
+//       { title, description, state, incidentDate },
+//       { new: true }
+//     );
+//     res.status(200).json(updatedReport);
+//   } catch (error) {
+//     console.error("Error updating report:", error);
+//     res.status(500).json({ error: "Error updating report" });
+//   }
+// });
+
 app.put("/report/:id", async (req, res) => {
   try {
     const reportId = req.params.id;
     const { title, description, state, incidentDate } = req.body;
+
+    // Verificar el rol del usuario
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+    const user = await User.findById(userId);
+
+    // Verificar si el usuario es administrador
+    if (user.role !== "admin") {
+      // Si no es administrador, enviar un error
+      return res.status(403).json({ error: "User is not authorized to update report state" });
+    }
+
+    // Si el usuario es administrador, actualizar el reporte
     const updatedReport = await Report.findByIdAndUpdate(
       reportId,
       { title, description, state, incidentDate },
@@ -331,6 +405,10 @@ app.put("/report/:id", async (req, res) => {
   }
 });
 
+
+
+
+
 /////////////////////////////////////////////////////////////////
 // iniciando la parte del Usuario (residente o administrador) //
 
@@ -338,15 +416,47 @@ app.put("/report/:id", async (req, res) => {
 // const userRouter = require('./UserRouter.js');
 // app.use('/users', userRouter);
 
+
+// app.get("/users", async (req, res) => {
+//   try {
+//     const users = await User.find();
+//     res.json(users);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: "Error fetching users" });
+//   }
+// });
+
 app.get("/users", async (req, res) => {
   try {
-    const users = await User.find();
-    res.json(users);
+    // Obtener el usuario desde el token de autenticación
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+
+    // Verificar el rol del usuario
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Si el usuario es administrador, devuelve todos los usuarios
+    if (user.role === "admin") {
+      const users = await User.find();
+      return res.json(users);
+    } else {
+      // Si el usuario no es administrador, devuelve solo su propio usuario
+      return res.json([user]);
+    }
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Error fetching users" });
+    return res.status(500).json({ error: "Error fetching users" });
   }
 });
+
 
 
 app.post("/users", async (req, res) => {
@@ -360,16 +470,16 @@ app.post("/users", async (req, res) => {
   }
 });
 
-// app.delete("/users/:id", async (req, res) => {
-//   try {
-//     const userId = req.params.id;
-//     await User.findByIdAndDelete(userId);
-//     res.status(200).json({ message: "User deleted successfully" });
-//   } catch (error) {
-//     console.error("Error deleting user:", error);
-//     res.status(500).json({ error: "Error deleting user" });
-//   }
-// });
+app.delete("/users/:id", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    await User.findByIdAndDelete(userId);
+    res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    res.status(500).json({ error: "Error deleting user" });
+  }
+});
 
 app.put("/users/:userId", async (req, res) => {
   try {
@@ -401,24 +511,7 @@ app.get("/users/:userId", async (req, res) => {
   }
 });
 
-const isAdmin = (req, res, next) => {
-  if (!req.user || req.user.role !== 'admin') {
-    return res.status(403).json({ error: 'Unauthorized access' });
-  }
-  next();
-};
 
-// app.get("/profile", isAdmin, (req, res) => {
-//   const token = req.cookies?.token;
-//   if (token) {
-//     jwt.verify(token, jwtSecret, {}, (err, userData) => {
-//       if (err) throw err;
-//       res.json(userData);
-//     });
-//   } else {
-//     res.status(401).json("no token");
-//   }
-// });
 
 app.get("/profile", (req, res) => {
   const token = req.cookies?.token;

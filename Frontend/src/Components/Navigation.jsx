@@ -1,11 +1,22 @@
 // Navigation.jsx
 import axios from "axios";
+import { useContext, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import { UserContext } from "../UserContext";
 
 
 
 const Navigation = () => {
-  
+  const { id, setId, setUsername } = useContext(UserContext);
+  const [ws, setWs] = useState(null);
+
+  function logout() {
+    axios.post("/logout").then(() => {
+      setWs(null);
+      setId(null);
+      setUsername(null);
+    });
+  }
   return (
     <>
       <nav className="bg-white w-full p-4 shadow-md">
@@ -19,14 +30,20 @@ const Navigation = () => {
               <Link to="/dashboard">Inicio</Link>
             </li>
             <li>
-              <a href="#">Sobre Nosotros</a>
+              <Link to="/reporte">Reportes</Link>
             </li>
             <li>
-              <a href="#">Servicios</a>
+              <Link to="/residente">Residente</Link>
             </li>
             <li>
-              <a href="#">Contacto</a>
+              <Link to="/chat"> Contacto</Link>
             </li>
+            <button
+              onClick={logout}
+              className="text-sm bg-blue-100 py-1 px-3  text-gray-500 border rounded-sm"
+            >
+              logout
+            </button>
           </ul>
         </div>
         <Outlet />

@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { saveAs } from 'file-saver';
 import { Link, Outlet } from "react-router-dom";
 import Swal from "sweetalert2";
 import ReportList from "./ReportList";
 import CreateReport from "./CreateReport";
+import Navigation from "../Navigation";
+
 
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
@@ -11,6 +14,7 @@ const ReportForm = ({ handleSubmit }) => {
   const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Número de elementos por página
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -96,9 +100,27 @@ const ReportForm = ({ handleSubmit }) => {
     setShowModal(false);
   };
 
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleExport = ()=>{
+    try {
+      const jsonReport = JSON.stringify(reports, null, 2);
+      const blob = new Blob([jsonReport], {type: "application/json"});
+      saveAs(blob, 'reports.json');
+    } catch (error) {
+      console.error(error)
+      Swal.fire('Error', 'Ha ocurrido un error al exportar los reportes', 'error');
+    }
+  }
+
+  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = reports.slice(indexOfFirstItem, indexOfLastItem);
+  const filteredReports = reports.filter((report) =>
+    report.createdBy.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const getsColorState = (state) => {
     switch (state) {
@@ -120,34 +142,33 @@ const ReportForm = ({ handleSubmit }) => {
   return (
     <>
       <div className="flex flex-col min-h-screen bg-blue-50">
-        <nav className="bg-white w-full p-4 shadow-md">
-          <div className="flex justify-between items-center">
-            <div className="text-xl font-bold">FixOasis</div>
-            <ul className="flex space-x-4">
-              <li>
-                <Link to="/dashboard">Inicio</Link>
-              </li>
-              <li>
-                <Link to="/chat">Sobre Nosotros</Link>
-              </li>
-              <li>
-                <a href="#">Servicios</a>
-              </li>
-              <li>
-                <a href="#">Contacto</a>
-              </li>
-            </ul>
-          </div>
-        </nav>
+        <Navigation/>
 
         <div className="flex items-center justify-between px-8 py-4">
           <h1 className="text-2xl font-semibold">Incidencias</h1>
+          <div className="px-12 mt-4 ">
+            <button 
+            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
+            onClick={handleExport}
+            >
+              Exportar Reportes
+            </button>
           <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
             onClick={() => setShowModal(true)}
           >
-            Crear Reporte
+            
+           + Crear Reporte
           </button>
+          <input
+              type="text"
+              value={searchTerm}
+              onChange={handleSearchChange}
+              placeholder="Search by username..."
+              className="p-2 mb-4 border border-gray-300 rounded-md"
+            />
+          </div>
+         
         </div>
 
         {showModal && (
@@ -157,8 +178,13 @@ const ReportForm = ({ handleSubmit }) => {
           />
         )}
 
-        <div className={`container mx-auto flex flex-col h-full ${reports.length > 5 ? 'overflow-y-auto' : ''}`}>
+        <div
+          className={`container mx-auto flex flex-col h-full ${
+            reports.length > 5 ? "overflow-y-auto" : ""
+          }`}
+        >
           <div className="overflow-x-auto  flex-grow ">
+            
             <table className="min-w-full bg-white shadow-md rounded-lg ">
               <thead className="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
                 <tr>
@@ -178,45 +204,47 @@ const ReportForm = ({ handleSubmit }) => {
                 </tr>
               </thead>
               <tbody className="text-gray-600 text-sm font-light">
-                {currentItems.map((report, index) => (
-                  <tr
-                    key={index}
-                    className="border-b border-gray-200 hover:bg-gray-100"
-                  >
-                    <td className="py-3 px-6 text-left whitespace-no-wrap">
-                      {report.createdBy}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {report.image && (
-                        <img
-                          src={report.image}
-                          alt="Report"
-                          className="h-12 w-12 rounded"
-                        />
-                      )}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      {new Date(report.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getsColorState(
-                          report.state
-                        )}`}
-                      >
-                        {report.state}
-                      </span>
-                    </td>
-                    <td className="py-3 px-6 text-left">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => handleView(report)}
-                      >
-                        Ver
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredReports
+                  .slice(indexOfFirstItem, indexOfLastItem)
+                  .map((report, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-gray-200 hover:bg-gray-100"
+                    >
+                      <td className="py-3 px-6 text-left whitespace-no-wrap">
+                        {report.createdBy}
+                      </td>
+                      <td className="py-3 px-6 text-left">
+                        {report.image && (
+                          <img
+                            src={report.image}
+                            alt="Report"
+                            className="h-12 w-12 rounded"
+                          />
+                        )}
+                      </td>
+                      <td className="py-3 px-6 text-left">
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-3 px-6 text-left">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getsColorState(
+                            report.state
+                          )}`}
+                        >
+                          {report.state}
+                        </span>
+                      </td>
+                      <td className="py-3 px-6 text-left">
+                        <button
+                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                          onClick={() => handleView(report)}
+                        >
+                          Ver
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
