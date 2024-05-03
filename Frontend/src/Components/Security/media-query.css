@@ -1,0 +1,45 @@
+@media (min-width: 350px) and (max-width: 768px) {
+    .wrapper,
+    .footer {
+      width: 100%;
+    }
+  
+    .wrapper__tittle {
+      height: 25px;
+      margin-bottom: 70px;
+      padding: 20px 0 0 24px;
+      width: 160px;
+    }
+  
+    .wrapper__content {
+      padding: 0 0 0 24px;
+    }
+  
+    .wrapper__content-img {
+      width: 286px;
+      height: 238px;
+      margin: 0 auto;
+    }
+  
+    .info__title {
+      font-size: 48px;
+      height: 142px;
+      line-height: 71.09px;
+  
+      width: 350px;
+    }
+  
+    .info__paragraph {
+      font-size: 18px;
+      height: 81px;
+      line-height: 26.66px;
+      width: 328px;
+    }
+  
+    .info__button {
+      height: 68px;
+      outline: none;
+      position: relative;
+      width: 216px;
+    }
+  }

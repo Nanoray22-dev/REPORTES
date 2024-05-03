@@ -1,12 +1,13 @@
-
-// Icons
 import { RiSearch2Line } from "react-icons/ri";
+import { FaLayerGroup } from "react-icons/fa";
 
-const Header = () => {
+const Header = ({ username }) => {
   return (
     <header className="flex flex-col md:flex-row items-center justify-between gap-4">
-      <h1 className="text-2xl md:text-3xl font-bold">
-         Welcome Back!, <span className="text-primary-100">{""}</span>
+      <h1 className="text-2xl md:text-3xl font-bold ">
+     
+         <span className="text-xl flex gap-3 "><FaLayerGroup />User: </span>
+         {username}
       </h1>
       <form className="w-full md:w-auto">
         <div className="relative">

@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-
-const EditUserForm = ({ userId }) => {
+import Swal from "sweetalert2";
+const EditUserForm = ({ userId, closeModal }) => {
   const [user, setUser] = useState(null);
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
         if (!userId) {
-          return; // Salir de la función si userId es null o undefined
+          return;
         }
-        const response = await axios.get(`/users/${userId}`); // Verificar la URL según tu configuración
+        const response = await axios.get(`/users/${userId}`);
         console.log("Response from API:", response); // Depurar la respuesta de la API
         setUser(response.data);
         console.log("User data:", response.data); // Depurar los datos del usuario
@@ -20,7 +19,31 @@ const EditUserForm = ({ userId }) => {
     };
 
     fetchUser();
-  }, [userId]); // Agregar userId como dependencia para que se vuelva a cargar cuando cambie
+  }, [userId]); // userId como dependencia para que se vuelva a cargar cuando cambie
+
+  // const handleSubmit = async (event) => {
+  //   event.preventDefault();
+
+  //   try {
+  //     const response = await axios.put(`/users/${userId}`, user);
+  //     console.log("User updated successfully:", response.data);
+  //     setFormVisible(false);
+  //     setUser(response.data);
+  //     Swal.fire({
+  //       icon: "success",
+  //       title: "¡Actualización Exitosa!",
+  //       text: "Los datos del usuario han sido actualizados correctamente.",
+  //       // showConfirmButton: false,
+  //       // timer: 3000,
+  //     }).then((result) => {
+  //       if (result.isConfirmed) {
+  //         window.location.reload();
+  //       }
+  //     });
+  //   } catch (error) {
+  //     console.error("Error updating user:", error);
+  //   }
+  // };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -28,12 +51,26 @@ const EditUserForm = ({ userId }) => {
     try {
       const response = await axios.put(`/users/${userId}`, user);
       console.log("User updated successfully:", response.data);
-      // Agregar cualquier lógica adicional después de la actualización exitosa
+      setUser(response.data);
+      Swal.fire({
+        icon: "success",
+        title: "¡Actualización Exitosa!",
+        text: "Los datos del usuario han sido actualizados correctamente.",
+      }).then((result) => {
+        if(result.isConfirmed){
+          window.location.reload();
+        }
+      })
+
+      // Cerrar el formulario después de mostrar el SweetAlert
+      closeModal();
+
     } catch (error) {
       console.error("Error updating user:", error);
-      // Agregar lógica para manejar errores de actualización
     }
   };
+  
+  
 
   if (!user) {
     return <div>Loading...</div>; // Mostrar un mensaje de carga mientras se obtienen los datos del usuario
@@ -41,7 +78,9 @@ const EditUserForm = ({ userId }) => {
 
   // Verificar si user es null antes de acceder a sus propiedades
   return (
-    <div className="max-w-xl mx-auto bg-white rounded-lg p-8 shadow-md">
+    <div
+      className="max-w-xl mx-auto bg-white rounded-lg p-8 shadow-md"
+    >
       <h2 className="text-2xl font-bold mb-4">Editar Usuario</h2>
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-6">
         <div className="mt-12">
@@ -170,11 +209,11 @@ const EditUserForm = ({ userId }) => {
           >
             <option value="admin">Admin</option>
             <option value="usuario">Usuario</option>{" "}
-            {/* Corregido "usuario" con minúscula */}
           </select>
         </div>
 
         <button
+
           type="submit"
           className="col-span-2 mt-4 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
         >

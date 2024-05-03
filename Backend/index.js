@@ -413,20 +413,6 @@ app.put("/report/:id", async (req, res) => {
 // iniciando la parte del Usuario (residente o administrador) //
 
 
-// const userRouter = require('./UserRouter.js');
-// app.use('/users', userRouter);
-
-
-// app.get("/users", async (req, res) => {
-//   try {
-//     const users = await User.find();
-//     res.json(users);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: "Error fetching users" });
-//   }
-// });
-
 app.get("/users", async (req, res) => {
   try {
     // Obtener el usuario desde el token de autenticación
@@ -456,8 +442,6 @@ app.get("/users", async (req, res) => {
     return res.status(500).json({ error: "Error fetching users" });
   }
 });
-
-
 
 app.post("/users", async (req, res) => {
   try {
@@ -510,8 +494,6 @@ app.get("/users/:userId", async (req, res) => {
     res.status(500).json({ error: "Error fetching user" });
   }
 });
-
-
 
 app.get("/profile", (req, res) => {
   const token = req.cookies?.token;

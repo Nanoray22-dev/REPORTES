@@ -5,7 +5,7 @@ import { Link, Outlet } from "react-router-dom";
 import Swal from "sweetalert2";
 import ReportList from "./ReportList";
 import CreateReport from "./CreateReport";
-import Navigation from "../Navigation";
+import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
 
 
@@ -80,14 +80,19 @@ const ReportForm = ({ handleSubmit }) => {
         text: "El estado del reporte se ha actualizado correctamente",
         icon: "success",
         showConfirmButton: false,
-        timer: 1000,
+        timer: 1500,
+        position: "top-end",
       });
     } catch (error) {
       console.error("Error updating report state:", error);
       Swal.fire(
-        "Error",
-        "Ha ocurrido un error al actualizar el estado del reporte",
-        "error"
+        {
+          title: "No tienes acceso para actualizar estado",
+          icon: "error",
+          showConfirmButton: false,
+          timer: 2000,
+          position: "top-end",
+        }
       );
     }
   };
@@ -227,7 +232,7 @@ const ReportForm = ({ handleSubmit }) => {
                         )}
                       </td>
                       <td className="py-3 px-6 text-left">
-                        {new Date(report.createdAt).toLocaleDateString()}
+                        {new Date(report.incidentDate).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-6 text-left">
                         <span

@@ -1,8 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import EditUserForm from "./UserEditForm";
-import Navigation from "../Navigation";
-import { Link } from "react-router-dom";
+import Navigation from "../Home/Navigation";
+
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
@@ -22,6 +22,8 @@ const UserTable = () => {
     fetchUsers();
   }, []);
 
+
+  
   const openModal = (userId) => {
     setEditUserId(userId);
     setIsModalOpen(true);
@@ -62,6 +64,7 @@ const UserTable = () => {
               <td className="px-6 py-4 whitespace-no-wrap">{user.residenceType}</td>
               <td className="px-6 py-4 whitespace-no-wrap">{user.role}</td>
 
+
               <td className="px-6 py-4 whitespace-no-wrap">
                 <button onClick={() => openModal(user._id)} className="text-indigo-600 hover:text-indigo-900">Editar</button>
               </td>
@@ -72,7 +75,7 @@ const UserTable = () => {
       {isModalOpen && <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
         <div className="bg-white p-6 rounded-lg">
           <button onClick={closeModal} className="absolute  mb-24  ">Cerrar</button>
-          <EditUserForm userId={editUserId} />
+          <EditUserForm userId={editUserId} closeModal={closeModal}/>
         </div>
       </div>}
     </div>

@@ -1,13 +1,14 @@
 import { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import InicioDeSession from "./InicioDeSession";
 import { UserContext } from "./UserContext";
 import Chat from "./Chat";
-import Dashboard from "./Components/Dashboard";
+import Dashboard from "./Components/Home/Dashboard";
 import ReportForm from "./Components/Report/ReportForm";
 import UserTable from "./Components/Profile/UserTable";
 import EditUserForm from "./Components/Profile/UserEditForm";
-import AccessDeniedPage from "./AccessDeniedPage";
+import AccessDeniedPage from "./Components/Security/AccessDeniedPage";
+import Profile from "./Components/Profile/Profile";
 // import Navigation from "./Components/Navigation";
 
 export default function Rutas() {
@@ -21,6 +22,8 @@ export default function Rutas() {
         <Route path="/reporte" element={<ReportForm />} />
         <Route path="/residente" element={<UserTable />} />
         <Route path="/editar" element={<EditUserForm />} />
+        <Route path="/profile" element={<Profile />} />
+
         <Route path="/access-denied" element={<AccessDeniedPage />} />
 
         <Route />

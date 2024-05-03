@@ -1,0 +1,123 @@
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@700&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;1,100;1,200;1,300;1,400&display=swap");
+
+.wrapper {
+  align-content: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.wrapper__tittle {
+  height: 25px;
+  padding: 40px 0 0 77px;
+  width: 160px;
+}
+
+.tittle {
+  color: var(--color);
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: var(--font-weight);
+  line-height: 25.18px;
+}
+
+.wrapper__content {
+  align-content: center;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 0 0 0 24px;
+}
+
+.wrapper__content-img {
+  width: 539.22px;
+  height: 447.43px;
+  margin: 70px 0 0 77px;
+}
+
+.img {
+  width: 100%;
+}
+
+.wrapper__content-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 447.43px;
+  margin: 70px 77px 0 0;
+}
+
+.info__title {
+  color: var(--color);
+  font-family: var(--font-family);
+  font-size: 64px;
+  font-weight: var(--font-weight);
+  height: 190px;
+  line-height: 94.78px;
+  width: 586px;
+}
+
+.info__paragraph {
+  font-family: var(--font-family);
+  font-size: 24px;
+  font-weight: 400;
+  height: 108px;
+  line-height: 35.54px;
+  width: 381px;
+}
+
+.info__button {
+  align-content: end;
+  background-color: var(--color);
+  border: none;
+  color: #fff;
+  height: 68px;
+  outline: none;
+  position: relative;
+  width: 216px;
+}
+
+.info__button::before {
+  background: rgba(255, 255, 255, 0.1);
+  content: "";
+  position: absolute;
+  transition: all 1s ease;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+}
+
+.info__button:hover::before {
+  cursor: pointer;
+  width: 100%;
+}
+
+.footer {
+  color: #bdbdbd;
+  display: flex;
+  justify-content: center;
+  margin-top: 60px;
+}
+
+.footer__content {
+  font-family: "Montserrat";
+  width: 370px;
+  height: 17px;
+}
+
+.footer__content p {
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 17.07px;
+}
+
+.name {
+  font-weight: var(--font-weight);
+}
+
+.dev {
+  font-weight: 500;
+}
