@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import { RiLineChartLine, RiHashtag } from "react-icons/ri";
 import axios from "axios";
 import { Link, Outlet } from "react-router-dom";
+import Avatar from "../Avatar";
 // import  logo from "/logo.png";
 
 function Dasboard({ username }) {
@@ -12,6 +13,7 @@ function Dasboard({ username }) {
   const [inProgressReportsCount, setInProgressReportsCount] = useState(0);
   const [completedReportsCount, setCompletedReportsCount] = useState(0);
   const [totalReportsCount, setTotalReportsCount] = useState(0);
+  const [recentMessages, setRecentMessages] = useState([]);
 
   useEffect(() => {
     axios
@@ -36,7 +38,17 @@ function Dasboard({ username }) {
       .catch((error) => {
         console.log("Error", error);
       });
+    fetchRecentMessages();
   }, []);
+
+  const fetchRecentMessages = async () => {
+    try {
+      const response = await axios.get("/recent-messages"); // Llamar a la nueva ruta del backend
+      setRecentMessages(response.data);
+    } catch (error) {
+      console.error("Error fetching recent messages:", error);
+    }
+  };
 
   const getsColorState = (state) => {
     switch (state) {
@@ -110,40 +122,40 @@ function Dasboard({ username }) {
           </div>
 
           {/* State del Reporte */}
-          {/* Card 3 */}
+
+          {/* Mensajes Recientes  */}
           <div className="col-span-1 md:col-span-2 flex flex-col justify-between">
-            <h1 className="text-2xl font-bold mb-8">Your projects</h1>
+            <h1 className="text-2xl font-bold mb-8">Your recent messages</h1>
             <div className="bg-white p-8 rounded-xl shadow-2xl">
-              <div className="flex items-center gap-4 mb-8">
-                <img
-                  src="https://img.freepik.com/foto-gratis/retrato-mujer-mayor-cerca_23-2149207185.jpg"
-                  className="w-14 h-14 object-cover rounded-full"
-                />
-                <div>
-                  <h3 className="font-bold">Logo design for Bakery</h3>
-                  <p className="text-gray-500">1 day remaining</p>
+              {recentMessages.map((message) => (
+                <div key={message._id} className="flex items-center gap-4 mb-4">
+                  {message.sender && (
+                    <Avatar
+                      userId={message.recipient.userId}
+                      username={message.recipient.username}
+                      online={message.recipient.online}
+                    />
+                  )}
+                  <div>
+                    {message.sender && (
+                      <h3 className="font-bold">{message.recipient.username}</h3>
+                    )}
+                    <p className="text-gray-500">{message.text}</p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-4 mb-4">
-                <img
-                  src="https://img.freepik.com/foto-gratis/retrato-mujer-mayor-cerca_23-2149207185.jpg"
-                  className="w-14 h-14 object-cover rounded-full"
-                />
-                <div>
-                  <h3 className="font-bold">Logo design for Bakery</h3>
-                  <p className="text-gray-500">1 day remaining</p>
-                </div>
-              </div>
+              ))}
               <div className="flex justify-end">
-                <a
+                <Link to={'/chat'}
                   href="#"
                   className="hover:text-primary-100 transition-colors hover:underline"
                 >
-                  See all projects
-                </a>
+                  See all messages
+                </Link>
               </div>
             </div>
           </div>
+
+          {/* Mensajes Recientes  */}
         </section>
 
         {/* Section 2 */}

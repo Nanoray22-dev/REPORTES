@@ -7,8 +7,8 @@ import { UserContext } from "../UserContext";
 
 
 const Navigation = () => {
-  const { id, setId, setUsername } = useContext(UserContext);
-  const [ws, setWs] = useState(null);
+  const {  setId, setUsername } = useContext(UserContext);
+  const [, setWs] = useState(null);
 
   function logout() {
     axios.post("/logout").then(() => {

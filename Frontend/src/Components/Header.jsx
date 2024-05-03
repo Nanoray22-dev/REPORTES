@@ -14,7 +14,7 @@ const Header = () => {
           <input
             type="text"
             className="bg-gray-200 outline-none py-2 pl-8 pr-4 rounded-xl w-full md:w-auto"
-            placeholder="Search for projects"
+            placeholder="Search for reports"
           />
         </div>
       </form>

@@ -525,6 +525,34 @@ app.get("/profile", (req, res) => {
   }
 });
 
+// Mensaje reciente //
 
+app.get("/recent-messages", authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId; // Ahora puedes acceder a req.user
+    const recentMessages = await Message.find({ recipient: userId }).sort({ createdAt: -1 }).limit(5);
+    res.json(recentMessages);
+  } catch (error) {
+    console.error("Error fetching recent messages:", error);
+    res.status(500).json({ error: "Error fetching recent messages" });
+  }
+});
+
+
+async function authenticateJWT(req, res, next) {
+  try {
+    const token = req.cookies?.token;
+    if (token) {
+      const decodedToken = jwt.verify(token, jwtSecret);
+      req.user = decodedToken; // Agrega la información del usuario al objeto req
+      next();
+    } else {
+      throw new Error("Token not provided");
+    }
+  } catch (error) {
+    console.error("Authentication error:", error);
+    res.status(401).json({ error: "Authentication failed" });
+  }
+}
 
 

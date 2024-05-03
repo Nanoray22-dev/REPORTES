@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import ReportList from "./ReportList";
 import CreateReport from "./CreateReport";
 import Navigation from "../Navigation";
+import { RiSearch2Line } from "react-icons/ri";
 
 
 const ReportForm = ({ handleSubmit }) => {
@@ -160,6 +161,8 @@ const ReportForm = ({ handleSubmit }) => {
             
            + Crear Reporte
           </button>
+         
+
           <input
               type="text"
               value={searchTerm}
