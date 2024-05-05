@@ -38,6 +38,7 @@ const Navigation = () => {
           </div>
 
           <ul className="flex space-x-4">
+            
             <li className="flex gap-1">
               <TiHomeOutline className="mt-1" />
               <Link to="/dashboard">Home</Link>
@@ -55,7 +56,7 @@ const Navigation = () => {
               <Link to="/"> Contacto</Link>
             </li>
 
-            <div className="relative">
+            <div className="">
               <button
                 onClick={toggleMenu}
                 className="flex items-center gap-1 text-black  px-2 rounded-xl hover:bg-primary-900/50 transition-colors"

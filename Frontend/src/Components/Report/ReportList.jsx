@@ -1,5 +1,6 @@
 import { useState } from "react";
-import logo from "../../../public/logo.png"
+import logo from "/logo.png"
+
 
 const ReportList = ({
   report,
@@ -68,6 +69,8 @@ const ReportList = ({
           </div>
         </div>
       )}
+
+
 
       {modalOpen && (
         <div className="fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">

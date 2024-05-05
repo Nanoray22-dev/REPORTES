@@ -9,7 +9,6 @@ import UserTable from "./Components/Profile/UserTable";
 import EditUserForm from "./Components/Profile/UserEditForm";
 import AccessDeniedPage from "./Components/Security/AccessDeniedPage";
 import Profile from "./Components/Profile/Profile";
-// import Navigation from "./Components/Navigation";
 
 export default function Rutas() {
   const { username } = useContext(UserContext);
