@@ -188,7 +188,7 @@ function Dasboard({ username }) {
                         onClick={() => {
                           handleReview(report._id), openModal(report);
                         }}
-                        className="mt-2 px-3 py-1 ml-96 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-colors"
+                        className="mt-2 px-3 py-1  bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-colors"
                       >
                         Review
                       </button>

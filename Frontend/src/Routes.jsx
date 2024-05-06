@@ -21,7 +21,7 @@ export default function Rutas() {
         <Route path="/reporte" element={<ReportForm />} />
         <Route path="/residente" element={<UserTable />} />
         <Route path="/editar" element={<EditUserForm />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<Profile username={username}/>} />
 
         <Route path="/access-denied" element={<AccessDeniedPage />} />
 

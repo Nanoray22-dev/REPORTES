@@ -13,6 +13,7 @@ export function UserContextProvider({children}) {
       setUsername(response.data.username);
     });
   }, []);
+  
   return (
     <UserContext.Provider value={{username, setUsername, id, setId,role, setRole}}>
       {children}

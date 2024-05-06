@@ -20,30 +20,7 @@ const EditUserForm = ({ userId, closeModal }) => {
 
     fetchUser();
   }, [userId]); // userId como dependencia para que se vuelva a cargar cuando cambie
-
-  // const handleSubmit = async (event) => {
-  //   event.preventDefault();
-
-  //   try {
-  //     const response = await axios.put(`/users/${userId}`, user);
-  //     console.log("User updated successfully:", response.data);
-  //     setFormVisible(false);
-  //     setUser(response.data);
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "¡Actualización Exitosa!",
-  //       text: "Los datos del usuario han sido actualizados correctamente.",
-  //       // showConfirmButton: false,
-  //       // timer: 3000,
-  //     }).then((result) => {
-  //       if (result.isConfirmed) {
-  //         window.location.reload();
-  //       }
-  //     });
-  //   } catch (error) {
-  //     console.error("Error updating user:", error);
-  //   }
-  // };
+ 
 
   const handleSubmit = async (event) => {
     event.preventDefault();

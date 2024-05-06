@@ -31,15 +31,15 @@ const Navigation = () => {
   }
   return (
     <>
-      <nav className="bg-white w-full p-4 shadow-md">
+      <nav className="bg-white w-full p-4 shadow-md ">
         <div className="flex justify-between items-center">
           <div className="text-xl font-bold text-gray-500">
             Fix<span className="text-orange-400">Oasis</span>{" "}
           </div>
 
-          <ul className="flex space-x-4">
+          <ul className="flex space-x-4 text-black">
             
-            <li className="flex gap-1">
+            <li className="flex gap-1 text-black">
               <TiHomeOutline className="mt-1" />
               <Link to="/dashboard">Home</Link>
             </li>
@@ -67,20 +67,20 @@ const Navigation = () => {
                 <div
                   className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
                   onMouseLeave={handleMouseLeave}
-                >
-                  <button onClick={logout} className="w-48">
-                    <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
-                  </button>
+                > <TreeNode
+                    icon={<MdOutlineContactMail />}
+                    label="My Profile"
+                    to="/profile"
+                  />
+                  
                   <TreeNode
                     icon={<AiOutlineLock />}
                     label="Change Password"
                     to="/change-password"
                   />
-                  <TreeNode
-                    icon={<MdOutlineContactMail />}
-                    label="My Profile"
-                    to="/profile"
-                  />
+                 <button onClick={logout} className="w-48">
+                    <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
+                  </button>
                 </div>
               )}
             </div>

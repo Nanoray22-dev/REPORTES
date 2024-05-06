@@ -5,7 +5,7 @@ const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const bcrypt = require("bcryptjs");
-const User = require("./models/User");
+const User = require("./Models/User");
 const Message = require("./models/Message");
 const ws = require("ws");
 const fs = require("fs");
@@ -70,17 +70,17 @@ app.get("/people", async (req, res) => {
   res.json(users);
 });
 
-// app.get("/profile", (req, res) => {
-//   const token = req.cookies?.token;
-//   if (token) {
-//     jwt.verify(token, jwtSecret, {}, (err, userData) => {
-//       if (err) throw err;
-//       res.json(userData);
-//     });
-//   } else {
-//     res.status(401).json("no token");
-//   }
-// });
+app.get("/profile", (req, res) => {
+  const token = req.cookies?.token;
+  if (token) {
+    jwt.verify(token, jwtSecret, {}, (err, userData) => {
+      if (err) throw err;
+      res.json(userData);
+    });
+  } else {
+    res.status(401).json("no token");
+  }
+});
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -495,17 +495,84 @@ app.get("/users/:userId", async (req, res) => {
   }
 });
 
-app.get("/profile", (req, res) => {
-  const token = req.cookies?.token;
-  if (token) {
-    jwt.verify(token, jwtSecret, {}, (err, userData) => {
-      if (err) throw err;
-      res.json(userData);
-    });
-  } else {
-    res.status(401).json("no token");
+app.get("/user", async (req, res) => {
+  try {
+    const userData = await getUserDataFromRequest(req);
+    const userId = userData.userId;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching user data" });
   }
 });
+
+
+async function getUserDataFromRequest(req) {
+  return new Promise((resolve) => {
+    const token = req.cookies?.token;
+    if (token) {
+      jwt.verify(token, jwtSecret, {}, (err, userData) => {
+        if (err) {
+          console.error("Error verifying token:", err);
+          resolve(null);
+        } else {
+          resolve(userData);
+        }
+      });
+    } else {
+      resolve(null);
+    }
+  });
+}
+
+
+
+// Ruta para cargar la imagen de perfil del usuario
+const storages = multer.memoryStorage();
+const uploads = multer({ storages });
+
+// Ruta para actualizar los datos del usuario y la imagen de perfil
+app.put("/user", uploads.single("profileImage"), async (req, res) => {
+  try {
+    const userData = await getUserDataFromRequest(req);
+    const userId = userData.userId;
+
+    // Obtener los datos del usuario a actualizar del cuerpo de la solicitud
+    const { username, email, address, phone, age, residenceType, role } = req.body;
+
+    // Actualizar el usuario autenticado
+    const updatedUserData = { username, email, address, phone, age, residenceType, role };
+    
+    // Si se cargó una imagen de perfil, actualizarla también
+    if (req.file) {
+      updatedUserData.profileImage = { data: req.file.buffer, contentType: req.file.mimetype };
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      updatedUserData,
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.status(200).json(updatedUser);
+  } catch (error) {
+    console.error("Error updating user:", error);
+    res.status(500).json({ error: "Error updating user" });
+  }
+});
+
+
+
+
+
 
 // Mensaje reciente //
 

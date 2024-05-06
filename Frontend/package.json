@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
     "@material-ui/core": "^4.12.4",
     "@mui/material": "^5.15.16",
     "@react-pdf/renderer": "^3.4.4",
@@ -25,10 +26,11 @@
     "react-icons": "^5.1.0",
     "react-router-dom": "^6.23.0",
     "react-slick": "^0.30.2",
+    "react-spinners": "^0.13.8",
+    "react-toastify": "^10.0.5",
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.10.8",
-    "tailwindcss": "^3.4.3",
-    "xlsx": "^0.18.5"
+    "tailwindcss": "^3.4.3"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

@@ -13,6 +13,7 @@ const UserSchema = new mongoose.Schema(
       required: false,
     },
     role: { type: String, enum: ["admin", "usuario"], default: "usuario" },
+    profileImage: { type: Buffer, required: false }
   },
   { timestamps: true }
 );
