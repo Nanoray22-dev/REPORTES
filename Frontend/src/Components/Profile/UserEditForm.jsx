@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import Swal from "sweetalert2";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const EditUserForm = ({ userId, closeModal }) => {
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -20,7 +21,8 @@ const EditUserForm = ({ userId, closeModal }) => {
 
     fetchUser();
   }, [userId]); // userId como dependencia para que se vuelva a cargar cuando cambie
- 
+  const notifySuccess = () => toast.success("User data updated successfully");
+  const notifyError = () => toast.error("Error updating user data");
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -29,21 +31,19 @@ const EditUserForm = ({ userId, closeModal }) => {
       const response = await axios.put(`/users/${userId}`, user);
       console.log("User updated successfully:", response.data);
       setUser(response.data);
-      Swal.fire({
-        icon: "success",
-        title: "¡Actualización Exitosa!",
-        text: "Los datos del usuario han sido actualizados correctamente.",
-      }).then((result) => {
-        if(result.isConfirmed){
-          window.location.reload();
-        }
-      })
+      // Swal.fire({
+      //   icon: "success",
+      //   title: "¡Actualización Exitosa!",
+      //   text: "Los datos del usuario han sido actualizados correctamente.",
+      // })
+      notifySuccess()
 
       // Cerrar el formulario después de mostrar el SweetAlert
       closeModal();
 
     } catch (error) {
       console.error("Error updating user:", error);
+      notifyError();
     }
   };
   
@@ -55,6 +55,8 @@ const EditUserForm = ({ userId, closeModal }) => {
 
   // Verificar si user es null antes de acceder a sus propiedades
   return (
+    <>
+    <ToastContainer/>
     <div
       className="max-w-xl mx-auto bg-white rounded-lg p-8 shadow-md"
     >
@@ -198,6 +200,7 @@ const EditUserForm = ({ userId, closeModal }) => {
         </button>
       </form>
     </div>
+    </>
   );
 };
 
