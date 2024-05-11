@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
 import Navigation from "../Home/Navigation";
 import axios from "axios";
-// import Swal from "sweetalert2";
+import './Loader.css';
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { HiCamera } from "react-icons/hi";
 
 function Profile({ username }) {
   const [user, setUser] = useState(null);
+  const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -44,13 +47,6 @@ function Profile({ username }) {
       console.log("User data updated successfully");
       setShowAlert(true);
       notifySuccess();
-      // Swal.fire({
-      //   position: "top-end",
-      //   icon: "success",
-      //   title: "Your work has been saved",
-      //   showConfirmButton: false,
-      //   timer: 1500,
-      // });
     } catch (error) {
       console.error("Error updating user data:", error);
       notifyError();
@@ -64,68 +60,81 @@ function Profile({ username }) {
     setUser({ ...user, [name]: value });
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      // Realizar acciones con el archivo, como subirlo al servidor o previsualizarlo
+      setAvatar(file);
+    }
+  };
+
+
   if (!user) {
-    return <div>Loading...</div>;
+    return (
+      <div className="grid place-items-center h-screen">
+        <div className="loader">
+         
+        </div>
+      </div>
+    );
   }
+  
 
   return (
     <>
       <Navigation />
       <ToastContainer />
-      <link
-        href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css"
-        rel="stylesheet"
-        id="bootstrap-css"
-      />
-      <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-      <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+      
       {/* Include the above in your HEAD tag */}
-
-      <div className="container">
-        <div className="row">
-          <div className="col-md-10">
-            <h1>{username}</h1>
-          </div>
-        </div>
-        <div className="row mt-4">
-          <div className="col-md-3">
-            <div className="text-center">
-              <img
-                src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
-                className="avatar img-circle img-thumbnail"
-                alt="avatar"
-              />
+      <div className="container mx-auto py-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Avatar y Estadísticas */}
+        <div className="md:col-span-1  rounded-md shadow-md bg-blue-50">
+          <div className="p-8">
+          <div className="p-8 relative">
+            <img
+              src={avatar ? URL.createObjectURL(avatar) : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"}
+              className="w-32 h-32 mx-auto rounded-full mb-4"
+              alt="avatar"
+            />
+            <label htmlFor="fileInput" className="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 flex items-center justify-center cursor-pointer bg-white rounded-full p-2 shadow-md">
+              <HiCamera className="w-6 h-6 text-gray-600" />
               <input
                 type="file"
-                className="text-center center-block file-upload"
+                id="fileInput"
+                className="hidden"
+                onChange={handleFileChange}
               />
-            </div>
-            <hr />
-            <ul className="list-group">
-              <li className="list-group-item text-muted">
-                Activity <i className="fa fa-dashboard fa-1x ml-2"></i>
+            </label>
+          </div>
+            <hr className="my-6" />
+            <ul className="list-none p-0">
+              <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                <span>Activity</span>
+                <span className="badge bg-blue-500 text-white rounded-full px-3 py-1">125</span>
               </li>
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                Shares{" "}
-                <span className="badge badge-primary badge-pill">125</span>
+              <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                <span>Shares</span>
+                <span className="badge bg-blue-500 text-white rounded-full px-3 py-1">13</span>
               </li>
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                Likes <span className="badge badge-primary badge-pill">13</span>
+              <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                <span>Likes</span>
+                <span className="badge bg-blue-500 text-white rounded-full px-3 py-1">37</span>
               </li>
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                Posts <span className="badge badge-primary badge-pill">37</span>
-              </li>
-              <li className="list-group-item d-flex justify-content-between align-items-center">
-                Followers{" "}
-                <span className="badge badge-primary badge-pill">78</span>
+              <li className="flex justify-between items-center py-2 border-b border-gray-200">
+                <span>Followers</span>
+                <span className="badge bg-blue-500 text-white rounded-full px-3 py-1">78</span>
               </li>
             </ul>
           </div>
-          <div className="col-md-9">
-            {loading && <div className="loading">Updating user data...</div>}
+        </div>
 
-            <form className="mt-4" onSubmit={handleSubmit}>
-              <div className="form-group row">
+        {/* Formulario de Perfil */}
+        <div className="md:col-span-2 bg-white rounded-md shadow-md p-8">
+          {loading && <div className="text-center text-gray-600 mb-4">Updating user data...</div>}
+
+          <form onSubmit={handleSubmit}>
+          <div className="form-group row">
                 <label htmlFor="username" className="col-sm-2 col-form-label">
                   Full Name:
                 </label>
@@ -244,20 +253,22 @@ function Profile({ username }) {
                   </select>
                 </div>
               </div>
-              <div className="form-group row">
-                <div className="col-sm-10 offset-sm-2">
-                  <button type="submit" className="btn btn-success mr-2">
-                    <i className="glyphicon glyphicon-ok-sign"></i> Save
-                  </button>
-                  <button type="reset" className="btn btn-secondary">
-                    <i className="glyphicon glyphicon-repeat"></i> Reset
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
+
+            {/* Agregar más campos de formulario aquí */}
+
+            <div className="flex justify-end">
+              <button type="submit" className="bg-blue-500 text-white py-2 px-6 rounded-md mr-2 hover:bg-blue-600 focus:outline-none focus:bg-blue-600">
+                Save
+              </button>
+              <button type="reset" className="bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 focus:outline-none focus:bg-gray-400">
+                Reset
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+    </div>
+      
       {/* /.container */}
     </>
   );
