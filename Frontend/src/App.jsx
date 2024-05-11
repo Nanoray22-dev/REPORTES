@@ -3,6 +3,8 @@ import {UserContextProvider} from "./UserContext";
 import Routes from "./Routes";
 import { BrowserRouter  } from 'react-router-dom';
 import { useState } from "react";
+import '@mantine/core/styles.css';
+import { MantineProvider } from '@mantine/core';
 
 function App() {
   axios.defaults.baseURL = 'http://localhost:4040';
@@ -11,7 +13,9 @@ function App() {
   return (
     <BrowserRouter>
     <UserContextProvider>
+      <MantineProvider>
       <Routes  setUsername={setUsername}/>
+      </MantineProvider>
     </UserContextProvider>
     </BrowserRouter>
   )

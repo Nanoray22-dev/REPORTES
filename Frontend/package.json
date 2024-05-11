@@ -11,9 +11,12 @@
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
+    "@mantine/core": "^7.9.1",
+    "@mantine/hooks": "^7.9.1",
     "@material-ui/core": "^4.12.4",
     "@mui/material": "^5.15.16",
     "@react-pdf/renderer": "^3.4.4",
+    "@tabler/icons-react": "^3.3.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
@@ -41,6 +44,8 @@
     "eslint-plugin-react": "^7.34.1",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.6",
+    "postcss-preset-mantine": "^1.15.0",
+    "postcss-simple-vars": "^7.0.1",
     "vite": "^5.2.0"
   }
 }

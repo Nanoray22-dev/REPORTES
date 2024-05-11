@@ -38,22 +38,30 @@ const Navigation = () => {
           </div>
 
           <ul className="flex space-x-4 text-black">
-            
             <li className="flex gap-1 text-black">
               <TiHomeOutline className="mt-1" />
-              <Link to="/dashboard">Home</Link>
+              <Link className="hover:text-black" to="/dashboard">
+                Home
+              </Link>
             </li>
             <li className="flex gap-1">
               <TbReportSearch className="mt-1" />
-              <Link to="/reporte">Reports</Link>
+              <Link className="hover:text-black" to="/reporte">
+                Reports
+              </Link>
             </li>
             <li className="flex gap-1">
               <AiOutlineUsergroupAdd className="mt-1" />
-              <Link to="/residente">Residents</Link>
+              <Link className="hover:text-black" to="/residente">
+                Residents
+              </Link>
             </li>
             <li className="flex gap-1">
               <MdOutlineContactSupport className="mt-1" />
-              <Link to="/"> Contacto</Link>
+              <Link className="hover:text-black" to="/">
+                {" "}
+                Contacto
+              </Link>
             </li>
 
             <div className="">
@@ -67,18 +75,21 @@ const Navigation = () => {
                 <div
                   className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
                   onMouseLeave={handleMouseLeave}
-                > <TreeNode
+                >
+                  {" "}
+                  <TreeNode
+                    className="hover:text-black no-underline"
                     icon={<MdOutlineContactMail />}
                     label="My Profile"
                     to="/profile"
                   />
-                  
                   <TreeNode
+                    className="hover:text-black"
                     icon={<AiOutlineLock />}
                     label="Change Password"
                     to="/change-password"
                   />
-                 <button onClick={logout} className="w-48">
+                  <button onClick={logout} className="w-48 hover:text-black">
                     <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
                   </button>
                 </div>
