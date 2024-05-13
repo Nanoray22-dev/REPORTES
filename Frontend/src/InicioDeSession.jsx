@@ -3,6 +3,7 @@ import axios from "axios";
 import { UserContext } from "./UserContext.jsx";
 import logo from "/logo.png";
 import PreLoader from "./Components/Helpers/PreLoader.jsx";
+import { useNavigate } from "react-router-dom";
 
 
 export default function RegisterAndLoginForm() {
@@ -10,9 +11,10 @@ export default function RegisterAndLoginForm() {
   const [password, setPassword] = useState("");
   const [notification, setNotification] = useState(null);
   const [isLoginOrRegister, setIsLoginOrRegister] = useState("login");
-  const { setUsername: setLoggedInUsername, setId } = useContext(UserContext);
+  const { setUsername: setLoggedInUsername, setId, role, setRole } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false); // Estado para controlar la carga
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para controlar si el usuario está autenticado o no
+  const navigate = useNavigate()
 
   async function handleSubmit(ev) {
     ev.preventDefault();
@@ -22,10 +24,20 @@ export default function RegisterAndLoginForm() {
       const { data } = await axios.post(url, { username, password });
       setLoggedInUsername(username);
       setId(data.id);
-      setIsLoggedIn(true); // Actualizar el estado para indicar que el usuario está autenticado
-      setIsLoading(false); // Desactivar el preloader después de la respuesta exitosa
+      setRole(data.role);
+      console.log(data.role)
+      setIsLoggedIn(true); 
+      setIsLoading(false); 
+
+      if(data.role === 'admin') {
+        console.log(data.role)
+        navigate('/dashboard')
+      }else{
+        navigate('/profile')
+      }
+
     } catch (error) {
-      setIsLoading(false); // Desactivar el preloader en caso de error también
+      setIsLoading(false); 
       if (error.response.status === 404) {
         setNotification("Usuario no encontrado. Intente con otro usuario.");
       } else if (error.response.status === 401) {
@@ -42,7 +54,7 @@ export default function RegisterAndLoginForm() {
 
   if (isLoggedIn) {
     // Si el usuario está autenticado, redirigir a otra página o mostrar el contenido correspondiente
-    return <div>Usuario autenticado. Bienvenido.</div>;
+   return <div>Bienvenido</div>
   }
 
   return (

@@ -21,8 +21,9 @@ export default function Rutas() {
       <Route path="/residente" element={role === "admin" ? <UserTable /> : <Navigate to="/access-denied" />} />
       <Route path="/editar" element={<EditUserForm />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/chat" element={<Chat />} />
       <Route path="/access-denied" element={<AccessDeniedPage />} />
-      <Route path="*" element={<Navigate to="/access-denied" />} />
+      {/* <Route path="*" element={<Navigate to="/access-denied" />} /> */}
     </Routes>
     );
   }

@@ -13,7 +13,7 @@ import { FcVoicePresentation } from "react-icons/fc";
 import { TbSettingsPlus } from "react-icons/tb";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import logo from "/logo.png";
 import { TreeNode } from "./TreeNode";
 
@@ -23,6 +23,7 @@ const Sidebar = ({ username }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const history = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -38,6 +39,7 @@ const Sidebar = ({ username }) => {
       setId(null);
       setUsername(null);
       setIsLoggedIn(false);
+      history('/')
     });
   }
   return (

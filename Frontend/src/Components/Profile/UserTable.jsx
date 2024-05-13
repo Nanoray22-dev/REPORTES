@@ -10,6 +10,7 @@ const UserTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState(null);
+  
 
   useEffect(() => {
     const fetchUsers = async () => {

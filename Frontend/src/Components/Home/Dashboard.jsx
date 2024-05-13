@@ -118,19 +118,10 @@ function Dasboard({ username }) {
               <FaLaptopHouse className="text-5xl mr-4 " />
               {totalReportsCount}
             </span>
-            <span className="py-1 px-3 bg-primary-300/80 text-white rounded-full">
+            {/* <span className="py-1 px-3 bg-primary-300/80 text-white rounded-full">
               + since last month
-            </span>
-            <span className="text-5xl text-center text-white  flex px-10">
-              {" "}
-              <FaLaptopHouse className="text-5xl mr-4 " />
-              {totalReportsCount}
-            </span>
-            <span className="text-5xl text-center text-white  flex px-10">
-              {" "}
-              <FaLaptopHouse className="text-5xl mr-4 " />
-              {totalReportsCount}
-            </span>
+            </span> */}
+           
           </div>
 
           {/* State del Reporte */}
@@ -159,7 +150,7 @@ function Dasboard({ username }) {
                   {inProgressReportsCount}
                 </span>
                 <div>
-                  <h3 className="font-bold text-blue-500">In Progress</h3>
+                  <h3 className="font-bold text-blue-500">Progress</h3>
                   <p className="text-gray-500"> this month</p>
                 </div>
               </div>

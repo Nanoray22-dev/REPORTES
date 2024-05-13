@@ -1,7 +1,7 @@
 // Navigation.jsx
 import axios from "axios";
 import { useContext, useState } from "react";
-import { Link, Outlet } from "react-router-dom";
+import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { TiHomeOutline } from "react-icons/ti";
 import { TbReportSearch, TbSettingsPlus } from "react-icons/tb";
@@ -11,6 +11,7 @@ import { RiLogoutBoxRLine } from "react-icons/ri";
 import { MdOutlineContactMail } from "react-icons/md";
 import { TreeNode } from "./TreeNode";
 const Navigation = () => {
+  const history = useNavigate();
   const { setId, setUsername } = useContext(UserContext);
   const [, setWs] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
@@ -27,6 +28,7 @@ const Navigation = () => {
       setWs(null);
       setId(null);
       setUsername(null);
+      history("/");
     });
 
   }
