@@ -1,26 +1,28 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Navigation from "../Home/Navigation";
 import axios from "axios";
 import "../Styles/Loader.css";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { HiCamera } from "react-icons/hi";
-import { Menu, Button, Text, rem } from "@mantine/core";
+import { Menu, Button, rem } from "@mantine/core";
 import {
   IconSettings,
-  IconSearch,
-  IconPhoto,
+  
   IconMessageCircle,
   IconTrash,
   IconArrowsLeftRight,
+  IconFileReport,
 } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../../UserContext";
 
 function Profile({ username, setIsLoggedIn }) {
   const [user, setUser] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const { role } = useContext(UserContext);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -77,6 +79,8 @@ function Profile({ username, setIsLoggedIn }) {
     }
   };
 
+
+
   if (!user) {
     return (
       <div className="grid place-items-center h-screen">
@@ -87,7 +91,7 @@ function Profile({ username, setIsLoggedIn }) {
 
   return (
     <>
-      <Navigation setIsLoggedIn={setIsLoggedIn}  />
+      <Navigation setIsLoggedIn={setIsLoggedIn} />
       <ToastContainer />
 
       {/* Include the above in your HEAD tag */}
@@ -110,7 +114,16 @@ function Profile({ username, setIsLoggedIn }) {
                       />
                     }
                   >
-                    Change my password
+                    <Link to={"/change-password"}>Change my password</Link>
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconFileReport
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                  >
+                    Social Reports
                   </Menu.Item>
                   <Menu.Item
                     leftSection={
@@ -119,12 +132,10 @@ function Profile({ username, setIsLoggedIn }) {
                       />
                     }
                   >
-                    <Link className="text-black hover:text-black" to={'/chat'}>
-                     Messages
+                    <Link className="text-black hover:text-black" to={"/chat"}>
+                      Messages
                     </Link>
                   </Menu.Item>
-                 
-                 
 
                   <Menu.Divider />
 
@@ -317,16 +328,27 @@ function Profile({ username, setIsLoggedIn }) {
                   Role:
                 </label>
                 <div className="col-sm-10">
-                  <select
-                    id="role"
-                    name="role"
-                    value={user.role}
-                    onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md form-control"
-                  >
-                    <option value="admin">Admin</option>
-                    <option value="usuario">Usuario</option>{" "}
-                  </select>
+                  {role === "admin" ? (
+                    <select
+                      id="role"
+                      name="role"
+                      value={user.role}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border-gray-300 rounded-md form-control"
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="usuario">Usuario</option>{" "}
+                    </select>
+                  ) : (
+                    <input
+                      name="role"
+                      id="role"
+                      disabled
+                      value={user.role}
+                      onChange={handleChange}
+                      className="mt-1 block w-full border-gray-300 rounded-md form-control"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -340,14 +362,17 @@ function Profile({ username, setIsLoggedIn }) {
                   Save
                 </button>
                 <button
+                  disabled
                   type="reset"
-                  className="bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 focus:outline-none focus:bg-gray-400"
+                  className="bg-gray-300 text-gray-700 py-2 px-6 rounded-md hover:bg-gray-400 focus:outline-none focus:bg-gray-400 cursor-not-allowed"
                 >
                   Reset
                 </button>
               </div>
             </form>
           </div>
+
+          
         </div>
       </div>
 

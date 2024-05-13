@@ -526,6 +526,39 @@ app.get("/user", async (req, res) => {
   }
 });
 
+
+app.post("/change-password", authenticateJWT, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.user.userId;
+    
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const passwordMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Incorrect current password" });
+    }
+
+    const hashedNewPassword = await bcrypt.hash(newPassword, bcryptSalt);
+
+    user.password = hashedNewPassword;
+    await user.save();
+
+    res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    console.error("Error updating password:", error);
+    res.status(500).json({ error: "Error updating password" });
+  }
+});
+
+
+
+
+
+
 async function getUserDataFromRequest(req) {
   return new Promise((resolve) => {
     const token = req.cookies?.token;
@@ -612,7 +645,7 @@ async function authenticateJWT(req, res, next) {
     const token = req.cookies?.token;
     if (token) {
       const decodedToken = jwt.verify(token, jwtSecret);
-      req.user = decodedToken; // Agrega la información del usuario al objeto req
+      req.user = decodedToken; 
       next();
     } else {
       throw new Error("Token not provided");

@@ -9,6 +9,7 @@ import UserTable from "./Components/Profile/UserTable";
 import EditUserForm from "./Components/Profile/UserEditForm";
 import AccessDeniedPage from "./Components/Security/AccessDeniedPage";
 import Profile from "./Components/Profile/Profile";
+import ChangePassword from "./Components/Profile/ChangePassword";
 
 export default function Rutas() {
   const { username , role} = useContext(UserContext);
@@ -21,8 +22,10 @@ export default function Rutas() {
       <Route path="/residente" element={role === "admin" ? <UserTable /> : <Navigate to="/access-denied" />} />
       <Route path="/editar" element={<EditUserForm />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/chat" element={<Chat />} />
       <Route path="/access-denied" element={<AccessDeniedPage />} />
+
       {/* <Route path="*" element={<Navigate to="/access-denied" />} /> */}
     </Routes>
     );
