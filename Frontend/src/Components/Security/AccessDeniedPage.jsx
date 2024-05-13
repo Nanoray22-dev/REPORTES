@@ -1,12 +1,13 @@
-import { Link } from "react-router-dom"
+import { Link, Outlet } from "react-router-dom"
 import './Access.css'
 import './reset.css'
 import './media-query.css'
 import toy from '/Scarecrow.png';
-import notFound from '/not-found.png';
+import Navigation from "../Home/Navigation";
 function AccessDeniedPage() {
   return (
     <>
+    <Navigation/>
      <main className="wrapper">
     <div className="wrapper__tittle">
       <h5 className="tittle">404 NOT FOUND</h5>
@@ -21,7 +22,7 @@ function AccessDeniedPage() {
           The page you are looking for might be removed or is temporarily
           unavailable
         </p>
-        <button className="info__button">
+        <button className="">
           <Link to={'/dashboard'}>BACK TO HOMEPAGE</Link>
         </button>
       </div>
@@ -34,6 +35,7 @@ function AccessDeniedPage() {
         <span className="dev">- devChallenge.io</span>
       </p>
     </div>
+    <Outlet/>
   </footer>
     </>
    

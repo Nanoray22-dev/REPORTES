@@ -95,15 +95,13 @@ app.post("/login", async (req, res) => {
         (err, token) => {
           res.cookie("token", token, { sameSite: "none", secure: true }).json({
             id: foundUser._id,
+            role: foundUser.role
           });
         }
       );
     }
   }
 });
-
-
-
 
 app.post("/register", async (req, res) => {
   const { username, password } = req.body;
@@ -132,7 +130,6 @@ app.post("/register", async (req, res) => {
     res.status(500).json("error");
   }
 });
-
 
 app.post("/logout", (req, res) => {
   res.cookie("token", "", { sameSite: "none", secure: true }).json("ok");
@@ -236,8 +233,6 @@ wss.on("connection", (connection, req) => {
 ////////////////////////////////////
 // iniciando la parte del reporte //
 
-
-
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "./uploads/");
@@ -252,7 +247,7 @@ const baseUrl = "http://localhost:4040/";
 
 // app.get("/report", async (req, res) => {
 //   try {
-//     const reports = await Report.find().populate("createdBy", "username"); 
+//     const reports = await Report.find().populate("createdBy", "username");
 //     const reportsWithUsername = reports.map(report => ({
 //       ...report.toObject(),
 //       createdBy: report.createdBy.username, // Reemplaza el ID del usuario con su nombre de usuario
@@ -284,19 +279,22 @@ app.get("/report", async (req, res) => {
     // Si el usuario es administrador, devuelve todos los reportes
     if (user.role === "admin") {
       const reports = await Report.find().populate("createdBy", "username");
-      const reportsWithUsername = reports.map(report => ({
+      const reportsWithUsername = reports.map((report) => ({
         ...report.toObject(),
         createdBy: report.createdBy.username,
-        image: report.image ? `${baseUrl}${report.image}` : null
+        image: report.image ? `${baseUrl}${report.image}` : null,
       }));
       return res.json(reportsWithUsername);
     } else {
       // Si el usuario no es administrador, devuelve solo los reportes creados por ese usuario
-      const reports = await Report.find({ createdBy: userId }).populate("createdBy", "username");
-      const reportsWithUsername = reports.map(report => ({
+      const reports = await Report.find({ createdBy: userId }).populate(
+        "createdBy",
+        "username"
+      );
+      const reportsWithUsername = reports.map((report) => ({
         ...report.toObject(),
         createdBy: report.createdBy.username,
-        image: report.image ? `${baseUrl}${report.image}` : null
+        image: report.image ? `${baseUrl}${report.image}` : null,
       }));
       return res.json(reportsWithUsername);
     }
@@ -306,10 +304,9 @@ app.get("/report", async (req, res) => {
   }
 });
 
-
 app.post("/report", upload.single("image"), async (req, res) => {
   try {
-    const { title, description, state,incidentDate } = req.body;
+    const { title, description, state, incidentDate } = req.body;
 
     let imagePath = null;
     if (req.file) {
@@ -391,7 +388,9 @@ app.put("/report/:id", async (req, res) => {
     // Verificar si el usuario es administrador
     if (user.role !== "admin") {
       // Si no es administrador, enviar un error
-      return res.status(403).json({ error: "User is not authorized to update report state" });
+      return res
+        .status(403)
+        .json({ error: "User is not authorized to update report state" });
     }
 
     // Si el usuario es administrador, actualizar el reporte
@@ -407,13 +406,8 @@ app.put("/report/:id", async (req, res) => {
   }
 });
 
-
-
-
-
 /////////////////////////////////////////////////////////////////
 // iniciando la parte del Usuario (residente o administrador) //
-
 
 app.get("/users", async (req, res) => {
   try {
@@ -447,8 +441,18 @@ app.get("/users", async (req, res) => {
 
 app.post("/users", async (req, res) => {
   try {
-    const { username, password, email, address, phone, age, residenceType } = req.body;
-    const newUser = await User.create({ username, password, email, address, phone, age, residenceType, role });
+    const { username, password, email, address, phone, age, residenceType } =
+      req.body;
+    const newUser = await User.create({
+      username,
+      password,
+      email,
+      address,
+      phone,
+      age,
+      residenceType,
+      role,
+    });
     res.status(201).json(newUser);
   } catch (error) {
     console.error(error);
@@ -469,8 +473,17 @@ app.delete("/users/:id", async (req, res) => {
 
 app.put("/users/:userId", async (req, res) => {
   try {
-    const userId = req.params.userId; 
-    const { username, password, email, address, phone, age, residenceType,role } = req.body;
+    const userId = req.params.userId;
+    const {
+      username,
+      password,
+      email,
+      address,
+      phone,
+      age,
+      residenceType,
+      role,
+    } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { username, password, email, address, phone, age, residenceType, role },
@@ -512,7 +525,6 @@ app.get("/user", async (req, res) => {
   }
 });
 
-
 async function getUserDataFromRequest(req) {
   return new Promise((resolve) => {
     const token = req.cookies?.token;
@@ -531,8 +543,6 @@ async function getUserDataFromRequest(req) {
   });
 }
 
-
-
 // Ruta para cargar la imagen de perfil del usuario
 const storages = multer.memoryStorage();
 const uploads = multer({ storages });
@@ -544,21 +554,31 @@ app.put("/user", uploads.single("profileImage"), async (req, res) => {
     const userId = userData.userId;
 
     // Obtener los datos del usuario a actualizar del cuerpo de la solicitud
-    const { username, email, address, phone, age, residenceType, role } = req.body;
+    const { username, email, address, phone, age, residenceType, role } =
+      req.body;
 
     // Actualizar el usuario autenticado
-    const updatedUserData = { username, email, address, phone, age, residenceType, role };
-    
+    const updatedUserData = {
+      username,
+      email,
+      address,
+      phone,
+      age,
+      residenceType,
+      role,
+    };
+
     // Si se cargó una imagen de perfil, actualizarla también
     if (req.file) {
-      updatedUserData.profileImage = { data: req.file.buffer, contentType: req.file.mimetype };
+      updatedUserData.profileImage = {
+        data: req.file.buffer,
+        contentType: req.file.mimetype,
+      };
     }
 
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      updatedUserData,
-      { new: true }
-    );
+    const updatedUser = await User.findByIdAndUpdate(userId, updatedUserData, {
+      new: true,
+    });
 
     if (!updatedUser) {
       return res.status(404).json({ error: "User not found" });
@@ -571,24 +591,20 @@ app.put("/user", uploads.single("profileImage"), async (req, res) => {
   }
 });
 
-
-
-
-
-
 // Mensaje reciente //
 
 app.get("/recent-messages", authenticateJWT, async (req, res) => {
   try {
     const userId = req.user.userId; // Ahora puedes acceder a req.user
-    const recentMessages = await Message.find({ recipient: userId }).sort({ createdAt: -1 }).limit(5);
+    const recentMessages = await Message.find({ recipient: userId })
+      .sort({ createdAt: -1 })
+      .limit(5);
     res.json(recentMessages);
   } catch (error) {
     console.error("Error fetching recent messages:", error);
     res.status(500).json({ error: "Error fetching recent messages" });
   }
 });
-
 
 async function authenticateJWT(req, res, next) {
   try {
@@ -605,5 +621,3 @@ async function authenticateJWT(req, res, next) {
     res.status(401).json({ error: "Authentication failed" });
   }
 }
-
-

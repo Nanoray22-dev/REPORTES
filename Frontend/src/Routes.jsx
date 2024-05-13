@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import InicioDeSession from "./InicioDeSession";
 import { UserContext } from "./UserContext";
 import Chat from "./Chat";
@@ -11,22 +11,19 @@ import AccessDeniedPage from "./Components/Security/AccessDeniedPage";
 import Profile from "./Components/Profile/Profile";
 
 export default function Rutas() {
-  const { username } = useContext(UserContext);
+  const { username , role} = useContext(UserContext);
 
   if (username) {
     return (
       <Routes>
-        <Route path="/dashboard" element={<Dashboard username={username} />} />
-        <Route path="/chat" element={<Chat />} />
-        <Route path="/reporte" element={<ReportForm />} />
-        <Route path="/residente" element={<UserTable />} />
-        <Route path="/editar" element={<EditUserForm />} />
-        <Route path="/profile" element={<Profile username={username}/>} />
-
-        <Route path="/access-denied" element={<AccessDeniedPage />} />
-
-        <Route />
-      </Routes>
+      <Route path="/dashboard" element={role === "admin" ? <Dashboard username={username} /> : <Navigate to="/access-denied" />} />
+      <Route path="/reporte" element={<ReportForm />} />
+      <Route path="/residente" element={role === "admin" ? <UserTable /> : <Navigate to="/access-denied" />} />
+      <Route path="/editar" element={<EditUserForm />} />
+      <Route path="/profile" element={<Profile />} />
+      <Route path="/access-denied" element={<AccessDeniedPage />} />
+      <Route path="*" element={<Navigate to="/access-denied" />} />
+    </Routes>
     );
   }
 

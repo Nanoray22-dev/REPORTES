@@ -28,6 +28,7 @@ const Navigation = () => {
       setId(null);
       setUsername(null);
     });
+
   }
   return (
     <>
@@ -89,7 +90,7 @@ const Navigation = () => {
                     label="Change Password"
                     to="/change-password"
                   />
-                  <button onClick={logout} className="w-48 hover:text-black">
+                  <button onClick={() => logout()} className="w-48 hover:text-black">
                     <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
                   </button>
                 </div>

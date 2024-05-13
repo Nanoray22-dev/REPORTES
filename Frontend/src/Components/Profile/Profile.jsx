@@ -16,7 +16,7 @@ import {
 } from "@tabler/icons-react";
 import { Link } from "react-router-dom";
 
-function Profile({ username }) {
+function Profile({ username, setIsLoggedIn }) {
   const [user, setUser] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -87,7 +87,7 @@ function Profile({ username }) {
 
   return (
     <>
-      <Navigation />
+      <Navigation setIsLoggedIn={setIsLoggedIn}  />
       <ToastContainer />
 
       {/* Include the above in your HEAD tag */}

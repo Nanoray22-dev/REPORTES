@@ -21,6 +21,8 @@ const Sidebar = ({ username }) => {
   const { id, setId, setUsername } = useContext(UserContext);
   const [ws, setWs] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -35,9 +37,9 @@ const Sidebar = ({ username }) => {
       setWs(null);
       setId(null);
       setUsername(null);
+      setIsLoggedIn(false);
     });
   }
-  const [showMenu, setShowMenu] = useState(false);
   return (
     <>
       <div
