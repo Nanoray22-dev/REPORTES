@@ -9,7 +9,7 @@ import UserTable from "./Components/Profile/UserTable";
 import EditUserForm from "./Components/Profile/UserEditForm";
 import AccessDeniedPage from "./Components/Security/AccessDeniedPage";
 import Profile from "./Components/Profile/Profile";
-import ChangePassword from "./Components/Profile/ChangePassword";
+import ChangePassword from "./Components/Security/ChangePassword";
 
 export default function Rutas() {
   const { username , role} = useContext(UserContext);

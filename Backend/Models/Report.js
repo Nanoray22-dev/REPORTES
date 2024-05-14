@@ -21,10 +21,10 @@ const reportSchema = new mongoose.Schema({
     type: Date, 
     required: true,
   },
-  comments:{
-    type: String,
-    required: false,
-  },
+  // comments:{
+  //   type: String,
+  //   required: false,
+  // },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId, 
     ref: "User",
