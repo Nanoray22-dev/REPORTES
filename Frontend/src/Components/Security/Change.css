@@ -1,0 +1,38 @@
+/* Estilos para el modal */
+.modal {
+    display: none; /* Oculta el modal por defecto */
+    position: fixed; /* Permite que el modal flote sobre el contenido */
+    z-index: 1; /* Coloca el modal por encima de otros elementos */
+    left: 0;
+    top: 0;
+    width: 100%; /* Establece el ancho del modal al 100% */
+    height: 100%; /* Establece la altura del modal al 100% */
+    overflow: auto; /* Permite hacer scroll si el contenido del modal es demasiado grande */
+    background-color: rgb(0,0,0); /* Fondo negro semi-transparente */
+    background-color: rgba(0,0,0,0.4); /* Fondo negro semi-transparente */
+  }
+  
+  /* Estilos para el contenido del modal */
+  .modal-content {
+    background-color: #fefefe; /* Fondo blanco */
+    margin: 15% auto; /* Centra el modal verticalmente */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* Establece el ancho del contenido del modal */
+  }
+  
+  /* Estilos para el botón de cerrar del modal */
+  .close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .close:hover,
+  .close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  

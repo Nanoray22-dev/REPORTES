@@ -12,7 +12,8 @@ const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 const Report = require("./Models/Report");
-
+const axios = require("axios");
+const bodyParser = require('body-parser');
 dotenv.config();
 mongoose
   .connect(process.env.MONGO_URL)
@@ -26,6 +27,7 @@ const jwtSecret = process.env.JWT_SECRET;
 const bcryptSalt = bcrypt.genSaltSync(10);
 
 const app = express();
+app.use(bodyParser.json());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(express.json());
 app.use(cookieParser());
@@ -559,6 +561,7 @@ app.post("/change-password", authenticateJWT, async (req, res) => {
 
 
 
+
 async function getUserDataFromRequest(req) {
   return new Promise((resolve) => {
     const token = req.cookies?.token;
@@ -655,3 +658,56 @@ async function authenticateJWT(req, res, next) {
     res.status(401).json({ error: "Authentication failed" });
   }
 }
+
+
+
+// Importa la biblioteca 'resend'
+const { Resend } = require('resend');
+
+// // Configura la clave de la API de Resend
+// const resend = new Resend('re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1');
+
+// // Define las opciones del correo electrónico
+// const emailOptions = {
+//   from: 'onboarding@resend.dev',
+//   to: 'raysellconcepcionpaulino@gmail.com',
+//   subject: 'Hello World',
+//   html: '<p>Hola, has solicitado restablecer tu contraseña. Sigue este enlace para restablecerla: <a href="http://example.com/reset-password">Restablecer Contraseña</a></p>'
+// };
+
+// // Envía el correo electrónico
+// resend.emails.send(emailOptions)
+//   .then(response => {
+//     console.log('Email sent successfully:', response);
+//   })
+//   .catch(error => {
+//     console.error('Error sending email:', error);
+//   });
+
+
+
+const resend = new Resend('re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1');
+
+// Define la ruta para enviar el correo de recuperación de contraseña
+app.post('/api/sendPasswordRecoveryEmail', async (req, res) => {
+  const { email } = req.body;
+
+  // Define las opciones del correo electrónico
+  const emailOptions = {
+    from: 'onboarding@resend.dev',
+    to: email,
+    subject: 'Recuperación de Contraseña',
+    html: '<p>Hola, has solicitado restablecer tu contraseña. Sigue este enlace para restablecerla: <a href="http://example.com/reset-password">Restablecer Contraseña</a></p>'
+  };
+
+
+  // Envía el correo electrónico
+  try {
+    const response = await resend.emails.send(emailOptions);
+    console.log('Email sent successfully:', response);
+    res.json({ message: 'Email enviado exitosamente.' });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    res.status(500).json({ message: 'Error al enviar el correo electrónico.' });
+  }
+});
