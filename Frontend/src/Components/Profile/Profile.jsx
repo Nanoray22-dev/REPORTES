@@ -228,7 +228,7 @@ function Profile({ username, setIsLoggedIn }) {
                 <div className="col-sm-10">
                   <input
                     type="text"
-                    className="form-control"
+                    className=" w-fit form-control"
                     id="username"
                     name="username"
                     value={user.username}
@@ -244,7 +244,7 @@ function Profile({ username, setIsLoggedIn }) {
                 <div className="col-sm-10">
                   <input
                     type="email"
-                    className="form-control"
+                    className="w-fit form-control"
                     id="email"
                     name="email"
                     value={user.email}
@@ -260,7 +260,7 @@ function Profile({ username, setIsLoggedIn }) {
                 <div className="col-sm-10">
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control w-fit"
                     id="phone"
                     name="phone"
                     value={user.phone}
@@ -276,7 +276,7 @@ function Profile({ username, setIsLoggedIn }) {
                 <div className="col-sm-10">
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control w-fit"
                     id="address"
                     name="address"
                     value={user.address}
@@ -292,7 +292,7 @@ function Profile({ username, setIsLoggedIn }) {
                 <div className="col-sm-10">
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control w-fit"
                     id="age"
                     name="age"
                     value={user.age}
@@ -314,7 +314,7 @@ function Profile({ username, setIsLoggedIn }) {
                     name="residenceType"
                     value={user.residenceType}
                     onChange={handleChange}
-                    className="mt-1 block w-full border-gray-300 rounded-md form-control"
+                    className="mt-1 block w-fit border-gray-300 rounded-md form-control "
                   >
                     <option value="casa">Casa</option>
                     <option value="apartamento">Apartamento</option>
@@ -334,7 +334,7 @@ function Profile({ username, setIsLoggedIn }) {
                       name="role"
                       value={user.role}
                       onChange={handleChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md form-control"
+                      className="mt-1 block w-fit border-gray-300 rounded-md form-control"
                     >
                       <option value="admin">Admin</option>
                       <option value="usuario">Usuario</option>{" "}

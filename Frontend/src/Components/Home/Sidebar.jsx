@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
 // Icons
 import {
-  RiWalletLine,
   RiMore2Fill,
   RiCloseFill,
   RiLogoutBoxRLine,
@@ -10,6 +9,7 @@ import { AiOutlineLock, AiOutlineUsergroupAdd } from "react-icons/ai";
 import { TbReportSearch } from "react-icons/tb";
 import { PiChats } from "react-icons/pi";
 import { FcVoicePresentation } from "react-icons/fc";
+import { CgDarkMode } from "react-icons/cg";
 import { TbSettingsPlus } from "react-icons/tb";
 import axios from "axios";
 import { UserContext } from "../../UserContext";
@@ -108,9 +108,9 @@ const Sidebar = ({ username }) => {
                     <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
                   </button>
                   <TreeNode
-                    icon={<AiOutlineLock />}
-                    label="Change Password"
-                    to="/change-password"
+                    icon={<CgDarkMode />}
+                    label="Dark/Light"
+                    to="#"
                   />
                 </div>
               )}

@@ -5,7 +5,8 @@ import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { TiHomeOutline } from "react-icons/ti";
 import { TbReportSearch, TbSettingsPlus } from "react-icons/tb";
-import { AiOutlineLock, AiOutlineUsergroupAdd } from "react-icons/ai";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
+import { CgDarkMode } from "react-icons/cg";
 import { MdOutlineContactSupport } from "react-icons/md";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { MdOutlineContactMail } from "react-icons/md";
@@ -88,9 +89,9 @@ const Navigation = () => {
                   />
                   <TreeNode
                     className="hover:text-black"
-                    icon={<AiOutlineLock />}
-                    label="Change Password"
-                    to="/change-password"
+                    icon={<CgDarkMode />}
+                    label="Dark/Light"
+                    to="#"
                   />
                   <button onClick={() => logout()} className="w-48 hover:text-black">
                     <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />

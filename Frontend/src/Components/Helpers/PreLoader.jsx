@@ -1,9 +1,10 @@
-import '../Styles/PreLoader.css'
+import "../Styles/PreLoader.css";
 
 const PreLoader = () => {
   return (
-    <div className="preloader">
-      <div className="loader"></div>
+    <div className="grid place-items-center h-screen">
+      <div className="loader ">
+      </div>
     </div>
   );
 };

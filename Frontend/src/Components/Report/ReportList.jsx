@@ -1,6 +1,7 @@
 import { useState } from "react";
-import logo from "/logo.png"
-
+import logo from "/logo.png";
+import { useContext } from "react";
+import { UserContext } from "../../UserContext";
 
 const ReportList = ({
   report,
@@ -10,6 +11,7 @@ const ReportList = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+  const { role } = useContext(UserContext);
   const handleStateChangeAndCloseModal = async (e, reportId) => {
     await handleStateChange(e, reportId);
     handleCloseModal();
@@ -27,9 +29,11 @@ const ReportList = ({
   const closeModal = () => {
     setModalOpen(false);
   };
-  
-  const imagesArray = Array.isArray(report.image) ? report.image : [report.image];
-  
+
+  const imagesArray = Array.isArray(report.image)
+    ? report.image
+    : [report.image];
+
   return (
     <div key={report._id} className="bg-white rounded-lg shadow-lg p-8 mb-4">
       <div className="flex items-center mb-4">
@@ -37,7 +41,7 @@ const ReportList = ({
         <div>
           <h3 className="text-lg font-semibold">{report.title}</h3>
           <p className="text-sm text-gray-500">
-             Reporte hecho por: {report.createdBy}
+            Reporte hecho por: {report.createdBy}
           </p>
           <p className="text-sm text-gray-500">
             Fecha: {new Date(report.createdAt).toLocaleDateString()}
@@ -62,7 +66,12 @@ const ReportList = ({
               </div>
             ))}
             <div className="w-full p-2 text-center">
-              <p className="text-blue-500 hover:underline cursor-pointer" onClick={() => {/* Aquí puedes implementar la lógica para ver más imágenes */}}>
+              <p
+                className="text-blue-500 hover:underline cursor-pointer"
+                onClick={() => {
+                  /* Aquí puedes implementar la lógica para ver más imágenes */
+                }}
+              >
                 Ver más fotos ({imagesArray.length})
               </p>
             </div>
@@ -70,31 +79,40 @@ const ReportList = ({
         </div>
       )}
 
-
-
       {modalOpen && (
         <div className="fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
           <div className="relative max-w-full max-h-full">
-            <button className="absolute top-2 right-2 bg-red-500 text-white px-4 py-2 rounded-lg" onClick={closeModal}>
+            <button
+              className="absolute top-2 right-2 bg-red-500 text-white px-4 py-2 rounded-lg"
+              onClick={closeModal}
+            >
               Cerrar
             </button>
-            <img src={selectedImage} alt="Report Image" className="max-w-full max-h-full" style={{ maxHeight: '80vh', maxWidth: '80vw' }} />
+            <img
+              src={selectedImage}
+              alt="Report Image"
+              className="max-w-full max-h-full"
+              style={{ maxHeight: "80vh", maxWidth: "80vw" }}
+            />
           </div>
         </div>
       )}
 
       <div className="flex mt-6">
-        <select
-          value={report.state}
-          onChange={(e) => handleStateChangeAndCloseModal(e, report._id)}
-          className="flex-1 p-2 mr-4 border rounded-md bg-gray-100"
-        >
-          <option value="PENDING">Pendiente</option>
-          <option value="IN_PROGRESS">En Progreso</option>
-          <option value="COMPLETED">Completado</option>
-          <option value="CLOSED">Tardia</option>
-          <option value="REJECTED">Rechazado</option>
-        </select>
+        {role === "admin" ? (
+          <select
+            value={report.state}
+            onChange={(e) => handleStateChangeAndCloseModal(e, report._id)}
+            className="flex-1 p-2 mr-4 border rounded-md bg-gray-100"
+          >
+            <option value="PENDING">Pendiente</option>
+            <option value="IN_PROGRESS">En Progreso</option>
+            <option value="COMPLETED">Completado</option>
+            <option value="CLOSED">Tardia</option>
+            <option value="REJECTED">Rechazado</option>
+          </select>
+        ) : null}
+
         <button
           onClick={() => handleDeleteAndCloseModal(report._id)}
           className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
