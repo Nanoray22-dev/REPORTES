@@ -409,6 +409,23 @@ app.put("/report/:id", async (req, res) => {
   }
 });
 
+// const httpServer = require('http').createServer(app);
+// const io = require('socket.io')(httpServer);
+
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
+
+//   // Manejar eventos de actualización de reportes
+//   socket.on('reportUpdated', (report) => {
+//     io.emit('reportUpdated', report); // Emitir el evento a todos los clientes conectados
+//   });
+
+//   socket.on('disconnect', () => {
+//     console.log('User disconnected');
+//   });
+// });
+
+
 // Envío de notificaciones: Función para enviar notificaciones cuando se asigna un informe
 async function sendNotificationToUser(reportId, userId) {
   const user = await User.findById(userId);

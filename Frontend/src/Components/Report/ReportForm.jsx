@@ -28,6 +28,7 @@ const ReportForm = ({ handleSubmit }) => {
     };
 
     fetchReports();
+    
   }, []);
 
   const handleDelete = async (reportId) => {
