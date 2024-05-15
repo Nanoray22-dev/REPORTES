@@ -19,7 +19,7 @@
     "@tabler/icons-react": "^3.3.0",
     "autoprefixer": "^10.4.19",
     "axios": "^1.6.8",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "5.3.3",
     "file-saver": "^2.0.5",
     "gsap": "^3.12.5",
     "lodash": "^4.17.21",

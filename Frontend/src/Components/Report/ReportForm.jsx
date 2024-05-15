@@ -7,7 +7,7 @@ import ReportList from "./ReportList";
 import CreateReport from "./CreateReport";
 import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
-
+import { TbEyeSearch, TbReportOff, TbSend } from "react-icons/tb";
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -185,19 +185,19 @@ const ReportForm = ({ handleSubmit }) => {
           />
         )}
         <div>
-          <h4 className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider, rounded-md">
-            Incidencias
+          <h4 className="px-6 py-3 bg-gray-50 text-left text-xl leading-4 font-bold text-gray-500 uppercase tracking-wider rounded-md ">
+            Reports
           </h4>
         </div>
         <div className="max-h-[450px] overflow-y-auto">
           <table className="w-full bg-white shadow-md rounded-lg">
             <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
               <tr>
-                <th className="px-6 py-3 bg-gray-50 text-left">Creado por</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Created by</th>
                 <th className="px-6 py-3 bg-gray-50 text-left">Imagen</th>
-                <th className="px-6 py-3 bg-gray-50 text-left">Fecha</th>
-                <th className="px-6 py-3 bg-gray-50 text-left">Estado</th>
-                <th className="px-6 py-3 bg-gray-50 text-left">Acción</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Date</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">State</th>
+                <th className="px-6 py-3 bg-gray-50 text-left"></th>
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
@@ -233,12 +233,44 @@ const ReportForm = ({ handleSubmit }) => {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <button
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        onClick={() => handleView(report)}
-                      >
-                        Ver
-                      </button>
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-primary dropdown-toggle"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          Action
+                        </button>
+                        <ul className="dropdown-menu">
+                          <li>
+                            <button
+                              className="dropdown-item flex gap-2"
+                              type="button"
+                              onClick={() => handleView(report)}
+                            >
+                             <TbEyeSearch className="text-xl"/>
+                             See report
+                            </button>
+                          </li>
+                          <li><hr className="dropdown-divider"/></li>
+                          <li>
+                            <button className="dropdown-item flex gap-2" type="button"
+                            onClick={() => handleDelete(report._id)}
+                            >
+                            <TbReportOff className="text-xl text-red-300" />
+                              Delete
+                            </button>
+                          </li>
+                          <li><hr className="dropdown-divider"/></li>
+                          <li>
+                            <button className="dropdown-item flex gap-2" type="button">
+                            <TbSend  className="text-xl"/>
+                              Send to 
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -250,35 +282,39 @@ const ReportForm = ({ handleSubmit }) => {
             In total there are {reports.length} Reports
           </h4>
         </div>
-
-        <div className="flex justify-center items-center mt-8 mb-4 space-x-4">
-          <button
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
-              currentPage === 1 ? "cursor-not-allowed" : ""
-            }`}
-          >
-            &#8592; {/* Flecha hacia la izquierda */}
-          </button>
+        <div className="flex justify-between mt-2">
           <div className="flex items-center">
-            <div className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded">
+            <p className="font-medium">Page</p>
+            <div className="text-gray-700 font-bold ml-2 rounded">
               {currentPage}
             </div>
-            <span className="text-gray-700 mx-2">de</span>
-            <div className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded">
+            <span className="text-gray-700 mx-2">of</span>
+            <div className="text-gray-700 font-bold rounded">
               {Math.ceil(reports.length / itemsPerPage)}
             </div>
           </div>
-          <button
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={indexOfLastItem >= reports.length}
-            className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
-              indexOfLastItem >= reports.length ? "cursor-not-allowed" : ""
-            }`}
-          >
-            &#8594; {/* Flecha hacia la derecha */}
-          </button>
+
+          <div className="space-x-2">
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
+                currentPage === 1 ? "cursor-not-allowed" : ""
+              }`}
+            >
+              &#8592; {/* Flecha hacia la izquierda */}
+            </button>
+
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={indexOfLastItem >= reports.length}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
+                indexOfLastItem >= reports.length ? "cursor-not-allowed" : ""
+              }`}
+            >
+              &#8594; {/* Flecha hacia la derecha */}
+            </button>
+          </div>
         </div>
 
         {selectedReport && (
