@@ -6,6 +6,7 @@ import Swal from "sweetalert2";
 import ReportList from "./ReportList";
 import CreateReport from "./CreateReport";
 import Navigation from "../Home/Navigation";
+import { RiSearch2Line } from "react-icons/ri";
 
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
@@ -150,9 +151,8 @@ const ReportForm = ({ handleSubmit }) => {
     <>
       <Navigation />
       <div className="container mx-auto">
-        <div className="mb-4 flex items-center justify-between p-2">
-          <h2 className="text-2xl font-bold mt-4 uppercase">Incidencias</h2>
-          <div className="">
+        <div className=" flex items-center justify-evenly p-4">
+          <div className="mt-4">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
               onClick={handleExport}
@@ -165,12 +165,15 @@ const ReportForm = ({ handleSubmit }) => {
             >
               + Crear Reporte
             </button>
+          </div>
+          <div className="relative ml-auto mt-4">
+            <RiSearch2Line className="absolute top-1/2 -translate-y-1/2 left-2" />
             <input
-              type="text"
               value={searchTerm}
               onChange={handleSearchChange}
-              placeholder="Search by username..."
-              className="p-2 mb-4 border border-gray-300 rounded-md"
+              type="text"
+              className="bg-gray-200 outline-none py-2 pl-8 pr-4 rounded-xl w-full md:w-auto"
+              placeholder="Search for username"
             />
           </div>
         </div>
@@ -181,7 +184,11 @@ const ReportForm = ({ handleSubmit }) => {
             onCloseModal={handleCloseModal}
           />
         )}
-
+        <div>
+          <h4 className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider, rounded-md">
+            Incidencias
+          </h4>
+        </div>
         <div className="max-h-[450px] overflow-y-auto">
           <table className="w-full bg-white shadow-md rounded-lg">
             <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
