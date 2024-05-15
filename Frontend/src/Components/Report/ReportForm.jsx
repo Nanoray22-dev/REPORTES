@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { saveAs } from 'file-saver';
-import { Link, Outlet } from "react-router-dom";
+import { saveAs } from "file-saver";
+import { Outlet } from "react-router-dom";
 import Swal from "sweetalert2";
 import ReportList from "./ReportList";
 import CreateReport from "./CreateReport";
 import Navigation from "../Home/Navigation";
-import { RiSearch2Line } from "react-icons/ri";
-
 
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
@@ -16,6 +14,7 @@ const ReportForm = ({ handleSubmit }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6; // Número de elementos por página
   const [searchTerm, setSearchTerm] = useState("");
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -85,15 +84,13 @@ const ReportForm = ({ handleSubmit }) => {
       });
     } catch (error) {
       console.error("Error updating report state:", error);
-      Swal.fire(
-        {
-          title: "No tienes acceso para actualizar estado",
-          icon: "error",
-          showConfirmButton: false,
-          timer: 2000,
-          position: "top-end",
-        }
-      );
+      Swal.fire({
+        title: "No tienes acceso para actualizar estado",
+        icon: "error",
+        showConfirmButton: false,
+        timer: 2000,
+        position: "top-end",
+      });
     }
   };
 
@@ -110,20 +107,24 @@ const ReportForm = ({ handleSubmit }) => {
     setSearchTerm(e.target.value);
   };
 
-  const handleExport = ()=>{
+  const handleExport = () => {
     try {
       const jsonReport = JSON.stringify(reports, null, 2);
-      const blob = new Blob([jsonReport], {type: "application/json"});
-      saveAs(blob, 'reports.json');
+      const blob = new Blob([jsonReport], { type: "application/json" });
+      saveAs(blob, "reports.json");
     } catch (error) {
-      console.error(error)
-      Swal.fire('Error', 'Ha ocurrido un error al exportar los reportes', 'error');
+      console.error(error);
+      Swal.fire(
+        "Error",
+        "Ha ocurrido un error al exportar los reportes",
+        "error"
+      );
     }
-  }
+  };
 
-  
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  // const currentItems = reports.slice(indexOfFirstItem, indexOfLastItem);
   const filteredReports = reports.filter((report) =>
     report.createdBy.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -147,28 +148,24 @@ const ReportForm = ({ handleSubmit }) => {
 
   return (
     <>
-      <div className="flex flex-col min-h-screen bg-blue-50">
-        <Navigation/>
-
-        <div className="flex items-center justify-between px-8 py-4">
-          <h1 className="text-2xl font-semibold">Incidencias</h1>
-          <div className="px-12 mt-4 ">
-            <button 
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
-            onClick={handleExport}
+      <Navigation />
+      <div className="container mx-auto">
+        <div className="mb-4 flex items-center justify-between p-2">
+          <h2 className="text-2xl font-bold mt-4 uppercase">Incidencias</h2>
+          <div className="">
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
+              onClick={handleExport}
             >
               Exportar Reportes
             </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
-            onClick={() => setShowModal(true)}
-          >
-            
-           + Crear Reporte
-          </button>
-         
-
-          <input
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+              onClick={() => setShowModal(true)}
+            >
+              + Crear Reporte
+            </button>
+            <input
               type="text"
               value={searchTerm}
               onChange={handleSearchChange}
@@ -176,7 +173,6 @@ const ReportForm = ({ handleSubmit }) => {
               className="p-2 mb-4 border border-gray-300 rounded-md"
             />
           </div>
-         
         </div>
 
         {showModal && (
@@ -186,95 +182,95 @@ const ReportForm = ({ handleSubmit }) => {
           />
         )}
 
-        <div
-          className={`container mx-auto flex flex-col h-full ${
-            reports.length > 5 ? "overflow-y-auto" : ""
-          }`}
-        >
-          <div className="overflow-x-auto  flex-grow ">
-            
-            <table className="min-w-full bg-white shadow-md rounded-lg ">
-              <thead className="bg-gray-200 text-gray-700 uppercase text-sm leading-normal">
-                <tr>
-                  <th
-                    className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider"
-                    colSpan="5"
+        <div className="max-h-[450px] overflow-y-auto">
+          <table className="w-full bg-white shadow-md rounded-lg">
+            <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
+              <tr>
+                <th className="px-6 py-3 bg-gray-50 text-left">Creado por</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Imagen</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Fecha</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Estado</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Acción</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-600 text-sm font-light">
+              {filteredReports
+                .slice(indexOfFirstItem, indexOfLastItem)
+                .map((report, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-200 hover:bg-gray-100"
                   >
-                    In total there are {reports.length} reports
-                  </th>
-                </tr>
-                <tr>
-                  <th className="py-3 px-6 text-left">Creado por</th>
-                  <th className="py-3 px-6 text-left">Imagen</th>
-                  <th className="py-3 px-6 text-left">Fecha</th>
-                  <th className="py-3 px-6 text-left">Estado</th>
-                  <th className="py-3 px-6 text-left">Acción</th>
-                </tr>
-              </thead>
-              <tbody className="text-gray-600 text-sm font-light">
-                {filteredReports
-                  .slice(indexOfFirstItem, indexOfLastItem)
-                  .map((report, index) => (
-                    <tr
-                      key={index}
-                      className="border-b border-gray-200 hover:bg-gray-100"
-                    >
-                      <td className="py-3 px-6 text-left whitespace-no-wrap">
-                        {report.createdBy}
-                      </td>
-                      <td className="py-3 px-6 text-left">
-                        {report.image && (
-                          <img
-                            src={report.image}
-                            alt="Report"
-                            className="h-12 w-12 rounded"
-                          />
-                        )}
-                      </td>
-                      <td className="py-3 px-6 text-left">
-                        {new Date(report.incidentDate).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 px-6 text-left">
-                        <span
-                          className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${getsColorState(
-                            report.state
-                          )}`}
-                        >
-                          {report.state}
-                        </span>
-                      </td>
-                      <td className="py-3 px-6 text-left">
-                        <button
-                          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                          onClick={() => handleView(report)}
-                        >
-                          Ver
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-              </tbody>
-            </table>
-          </div>
+                    <td className="px-6 py-4 whitespace-no-wrap">
+                      {report.createdBy}
+                    </td>
+                    <td className="px-6 py-4">
+                      {report.image && (
+                        <img
+                          src={report.image}
+                          alt="Reporte"
+                          className="h-12 w-12 rounded-full"
+                        />
+                      )}
+                    </td>
+                    <td className="px-6 py-4">
+                      {new Date(report.incidentDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getsColorState(
+                          report.state
+                        )}`}
+                      >
+                        {report.state}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <button
+                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                        onClick={() => handleView(report)}
+                      >
+                        Ver
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <h4 className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+            In total there are {reports.length} Reports
+          </h4>
         </div>
 
-        <div className="flex justify-center mt-4 ">
+        <div className="flex justify-center items-center mt-8 mb-4 space-x-4">
           <button
             onClick={() => setCurrentPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4 mr-4 rounded"
+            className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
+              currentPage === 1 ? "cursor-not-allowed" : ""
+            }`}
           >
-            Anterior
+            &#8592; {/* Flecha hacia la izquierda */}
           </button>
-          <div>
-            Página {currentPage} de {Math.ceil(reports.length / itemsPerPage)}
+          <div className="flex items-center">
+            <div className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded">
+              {currentPage}
+            </div>
+            <span className="text-gray-700 mx-2">de</span>
+            <div className="bg-gray-200 text-gray-700 font-bold py-2 px-4 rounded">
+              {Math.ceil(reports.length / itemsPerPage)}
+            </div>
           </div>
           <button
             onClick={() => setCurrentPage(currentPage + 1)}
             disabled={indexOfLastItem >= reports.length}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 font-bold py-2 px-4  ml-4 rounded"
+            className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
+              indexOfLastItem >= reports.length ? "cursor-not-allowed" : ""
+            }`}
           >
-            Siguiente
+            &#8594; {/* Flecha hacia la derecha */}
           </button>
         </div>
 
@@ -287,6 +283,7 @@ const ReportForm = ({ handleSubmit }) => {
                   handleStateChange={handleStateChange}
                   handleDelete={handleDelete}
                   handleCloseModal={handleCloseModal}
+                  users={users}
                 />
               </div>
             </div>

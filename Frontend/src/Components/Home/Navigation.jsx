@@ -62,7 +62,7 @@ const Navigation = () => {
             </li>
             <li className="flex gap-1">
               <MdOutlineContactSupport className="mt-1" />
-              <Link className="hover:text-black" to="/">
+              <Link className="hover:text-black" to="/assign">
                 {" "}
                 Contacto
               </Link>
@@ -103,6 +103,7 @@ const Navigation = () => {
         </div>
         <Outlet />
       </nav>
+      
     </>
   );
 };

@@ -409,6 +409,74 @@ app.put("/report/:id", async (req, res) => {
   }
 });
 
+// Envío de notificaciones: Función para enviar notificaciones cuando se asigna un informe
+async function sendNotificationToUser(reportId, userId) {
+  const user = await User.findById(userId);
+  const report = await Report.findById(reportId);
+  // Aquí puedes enviar la notificación al usuario, ya sea por correo electrónico, notificación push, etc.
+  console.log(`Se te ha asignado el informe "${report.title}"`);
+}
+
+
+app.post("/assign-report/:reportId", async (req, res) => {
+  try {
+    const { userId } = req.body;
+    const reportId = req.params.reportId;
+
+    // Asignar el informe al usuario especificado
+    await Report.findByIdAndUpdate(reportId, { assignedTo: userId });
+
+    // Enviar notificación al usuario asignado
+    await sendNotificationToUser(reportId, userId);
+
+    res.status(200).json({ message: "Informe asignado exitosamente" });
+  } catch (error) {
+    console.error("Error asignando informe:", error);
+    res.status(500).json({ error: "Error asignando informe" });
+  }
+});
+
+//  Seguimiento del estado del informe: Marcar un informe como revisado
+app.put("/mark-report-reviewed/:reportId", async (req, res) => {
+  try {
+    const reportId = req.params.reportId;
+
+    // Actualizar el estado del informe como revisado
+    await Report.findByIdAndUpdate(reportId, { state: "REVIEWED" });
+
+    res.status(200).json({ message: "Informe marcado como revisado" });
+  } catch (error) {
+    console.error("Error marcando informe como revisado:", error);
+    res.status(500).json({ error: "Error marcando informe como revisado" });
+  }
+});
+
+async function assignReportAndNotify(reportId, userId) {
+  try {
+    // Asignar el informe al usuario especificado
+    await Report.findByIdAndUpdate(reportId, { assignedTo: userId });
+
+    // Enviar notificación al usuario asignado
+    await sendNotificationToUser(reportId, userId);
+
+    return { message: "Informe asignado exitosamente" };
+  } catch (error) {
+    console.error("Error asignando informe:", error);
+    throw new Error("Error asignando informe");
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 /////////////////////////////////////////////////////////////////
 // iniciando la parte del Usuario (residente o administrador) //
 

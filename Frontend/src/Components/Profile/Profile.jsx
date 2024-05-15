@@ -346,7 +346,7 @@ function Profile({ username, setIsLoggedIn }) {
                       disabled
                       value={user.role}
                       onChange={handleChange}
-                      className="mt-1 block w-full border-gray-300 rounded-md form-control"
+                      className="mt-1 block w-fit border-gray-300 rounded-md form-control"
                     />
                   )}
                 </div>
