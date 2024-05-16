@@ -4,7 +4,7 @@ import EditUserForm from "./UserEditForm";
 import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
 import { FaUserEdit } from "react-icons/fa";
-import ColumnSelector from "./ColumnSelector";
+import Selector from "./Selector";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
@@ -12,7 +12,6 @@ const UserTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState(null);
-
   const [selectedColumns, setSelectedColumns] = useState([
     "username",
     "email",
@@ -68,12 +67,8 @@ const UserTable = () => {
     user.username.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const toggleColumn = (column) => {
-    setSelectedColumns((prevSelectedColumns) =>
-      prevSelectedColumns.includes(column)
-        ? prevSelectedColumns.filter((col) => col !== column)
-        : [...prevSelectedColumns, column]
-    );
+  const handleColumnChange = (selectedColumns) => {
+    setSelectedColumns(selectedColumns);
   };
 
   return (
@@ -83,7 +78,9 @@ const UserTable = () => {
         <div className="mb-4 flex p-2">
           <h2 className="text-2xl font-bold mt-4 uppercase">Residents</h2>
 
-          <div className="relative ml-auto mt-4">
+          <div className="relative ml-auto mt-4 flex items-center gap-2">
+            
+
             <div className="relative">
               <RiSearch2Line className="absolute top-1/2 -translate-y-1/2 left-2" />
               <input
@@ -94,13 +91,13 @@ const UserTable = () => {
                 placeholder={`Search by username`}
               />
             </div>
+
+            <Selector
+              selectedColumns={selectedColumns}
+              onChange={handleColumnChange}
+            />
           </div>
         </div>
-
-        <ColumnSelector
-          selectedColumns={selectedColumns}
-          onChange={toggleColumn}
-        />
 
         <div className="max-h-[450px] overflow-y-auto">
           <table className="min-w-full bg-gray-50/50">
@@ -151,7 +148,7 @@ const UserTable = () => {
                     className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider cursor-pointer"
                     onClick={() => handleSort("residenceType")}
                   >
-                    Residence 
+                    Residence Type
                   </th>
                 )}
                 {selectedColumns.includes("role") && (
@@ -220,10 +217,14 @@ const UserTable = () => {
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-gray-500 bg-opacity-75">
             <div className="bg-white p-6 rounded-lg">
-              <button onClick={closeModal} className="absolute  mb-24">
+              <button onClick={closeModal} className="absolute mb-24">
                 Cerrar
               </button>
-              <EditUserForm userId={editUserId} closeModal={closeModal} onUserUpdated={handleUserUpdated} />
+              <EditUserForm
+                userId={editUserId}
+                closeModal={closeModal}
+                onUserUpdated={handleUserUpdated}
+              />
             </div>
           </div>
         )}
