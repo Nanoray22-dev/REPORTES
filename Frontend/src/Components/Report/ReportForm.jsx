@@ -256,7 +256,7 @@ const ReportForm = ({ handleSubmit }) => {
                           </li>
                           <li><hr className="dropdown-divider"/></li>
                           <li>
-                            <button className="dropdown-item flex gap-2" type="button"
+                            <button className="dropdown-item flex gap-2 text-red-500" type="button"
                             onClick={() => handleDelete(report._id)}
                             >
                             <TbReportOff className="text-xl text-red-300" />

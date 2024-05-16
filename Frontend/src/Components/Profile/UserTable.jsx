@@ -1,8 +1,10 @@
+// UserTable.js
 import { useState, useEffect } from "react";
 import axios from "axios";
 import EditUserForm from "./UserEditForm";
 import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
+import { FaUserEdit } from "react-icons/fa";
 
 const UserTable = () => {
   const [users, setUsers] = useState([]);
@@ -10,7 +12,6 @@ const UserTable = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState(null);
-  
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -33,6 +34,12 @@ const UserTable = () => {
   const closeModal = () => {
     setEditUserId(null);
     setIsModalOpen(false);
+  };
+
+  const handleUserUpdated = (updatedUser) => {
+    setUsers((prevUsers) =>
+      prevUsers.map((user) => (user._id === updatedUser._id ? updatedUser : user))
+    );
   };
 
   const filteredUsers = users.filter((user) =>
@@ -70,7 +77,7 @@ const UserTable = () => {
           </div>
         </div>
         <div className="max-h-[450px] overflow-y-auto">
-          <table className="min-w-full">
+          <table className="min-w-full bg-gray-50/50">
             <thead className="sticky top-0 bg-white">
               <tr>
                 <th
@@ -145,7 +152,7 @@ const UserTable = () => {
                       onClick={() => openModal(user._id)}
                       className="text-indigo-600 hover:text-indigo-900"
                     >
-                      Editar
+                      <FaUserEdit className="text-xl" />
                     </button>
                   </td>
                 </tr>
@@ -156,7 +163,7 @@ const UserTable = () => {
 
         <div>
           <h4 className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-            In total there are {users.length} user
+            In total there are {users.length} users
           </h4>
         </div>
 
@@ -166,7 +173,7 @@ const UserTable = () => {
               <button onClick={closeModal} className="absolute  mb-24  ">
                 Cerrar
               </button>
-              <EditUserForm userId={editUserId} closeModal={closeModal} />
+              <EditUserForm userId={editUserId} closeModal={closeModal} onUserUpdated={handleUserUpdated} />
             </div>
           </div>
         )}
