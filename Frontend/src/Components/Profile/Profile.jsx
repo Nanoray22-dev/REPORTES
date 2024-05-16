@@ -8,7 +8,6 @@ import { HiCamera } from "react-icons/hi";
 import { Menu, Button, rem } from "@mantine/core";
 import {
   IconSettings,
-  
   IconMessageCircle,
   IconTrash,
   IconArrowsLeftRight,
@@ -78,8 +77,6 @@ function Profile({ username, setIsLoggedIn }) {
       setAvatar(file);
     }
   };
-
-
 
   if (!user) {
     return (
@@ -371,8 +368,6 @@ function Profile({ username, setIsLoggedIn }) {
               </div>
             </form>
           </div>
-
-          
         </div>
       </div>
 

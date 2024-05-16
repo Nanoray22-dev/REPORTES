@@ -2,7 +2,7 @@ import { useState } from "react";
 import logo from "/logo.png";
 import { useContext } from "react";
 import { UserContext } from "../../UserContext";
-import AssignReport from "./AssignReport";
+
 
 const ReportList = ({
   report,
@@ -70,7 +70,7 @@ const ReportList = ({
               <p
                 className="text-blue-500 hover:underline cursor-pointer"
                 onClick={() => {
-                  /* Aquí puedes implementar la lógica para ver más imágenes */
+                  /*  implementar la lógica para ver más imágenes */
                 }}
               >
                 Ver más fotos ({imagesArray.length})

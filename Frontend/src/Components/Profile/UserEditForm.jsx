@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+import "../Styles/Loader.css";
 const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
   const [user, setUser] = useState(null);
 
@@ -20,7 +20,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
     };
 
     fetchUser();
-  }, [userId]); //  vuelva a cargar cuando cambie
+  }, [userId]); // userId como dependencia para que se vuelva a cargar cuando cambie
 
   const notifySuccess = () => toast.success("User data updated successfully");
   const notifyError = () => toast.error("Error updating user data");
@@ -32,18 +32,18 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
       const response = await axios.put(`/users/${userId}`, user);
       setUser(response.data);
       notifySuccess();
-      // la función con los datos del usuario actualizado
+      // Llamar a la función onUserUpdated con los datos del usuario actualizado
       onUserUpdated(response.data);
-      // Cerrar el formulario
+      // Cerrar el formulario después de mostrar el SweetAlert
       closeModal();
     } catch (error) {
-      // console.error("Error updating user:", error);
+      console.error("Error updating user:", error);
       notifyError();
     }
   };
 
   if (!user) {
-    return <div>Loading...</div>; // Mostrar un mensaje de carga mientras se obtienen los datos del usuario
+    return <div className="loader"></div>;
   }
 
   return (
@@ -52,7 +52,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
       <div className="max-w-xl mx-auto bg-white rounded-lg p-8 shadow-md">
         <h2 className="text-2xl font-bold mb-4">Editar Usuario</h2>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-6">
-          <div className="mt-12">
+          <div className="">
             <label
               htmlFor="username"
               className="block text-sm font-medium text-gray-700"
@@ -67,10 +67,10 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, username: event.target.value })
               }
-              className="mt-1 block w-full border-black rounded-md "
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             />
           </div>
-          <div className="mt-12">
+          <div className="">
             <label
               htmlFor="email"
               className="block text-sm font-medium text-gray-700"
@@ -85,7 +85,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, email: event.target.value })
               }
-              className="mt-1 block w-full border-black rounded-md"
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             />
           </div>
           <div className="mt-12">
@@ -103,7 +103,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, address: event.target.value })
               }
-              className="mt-1 block w-full border-gray-300 rounded-md "
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             />
           </div>
           <div className="mt-12">
@@ -121,7 +121,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, phone: event.target.value })
               }
-              className="mt-1 block w-full border-gray-300 rounded-md "
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             />
           </div>
           <div className="mt-12">
@@ -139,7 +139,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, age: event.target.value })
               }
-              className="mt-1 block w-full border-gray-300 rounded-md "
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             />
           </div>
           <div className="mt-12">
@@ -156,7 +156,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, residenceType: event.target.value })
               }
-              className="mt-1 block w-full border-gray-300 rounded-md "
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             >
               <option value="casa">Casa</option>
               <option value="apartamento">Apartamento</option>
@@ -178,7 +178,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
               onChange={(event) =>
                 setUser({ ...user, role: event.target.value })
               }
-              className="mt-1 block w-full border-gray-300 rounded-md"
+              className="mt-1 block w-full border-gray-300 rounded-md form-control"
             >
               <option value="admin">Admin</option>
               <option value="usuario">Usuario</option>{" "}
