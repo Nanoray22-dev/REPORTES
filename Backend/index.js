@@ -14,6 +14,9 @@ const multer = require("multer");
 const path = require("path");
 const axios = require("axios");
 const bodyParser = require('body-parser');
+const socketIo = require('socket.io');
+// const server = http.createServer(app);
+
 dotenv.config();
 mongoose
   .connect(process.env.MONGO_URL)
@@ -37,6 +40,24 @@ app.use(
     origin: process.env.CLIENT_URL,
   })
 );
+const server = app.listen(4040);
+const io = socketIo(server);
+// WebSockets
+io.on('connection', (socket) => {
+  console.log('New client connected');
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  });
+
+  socket.on('joinReport', (reportId) => {
+    socket.join(reportId);
+  });
+
+  socket.on('leaveReport', (reportId) => {
+    socket.leave(reportId);
+  });
+});
 
 async function getUserDataFromRequest(req) {
   return new Promise((resolve, reject) => {
@@ -137,7 +158,7 @@ app.post("/logout", (req, res) => {
   res.cookie("token", "", { sameSite: "none", secure: true }).json("ok");
 });
 
-const server = app.listen(4040);
+
 
 const wss = new ws.WebSocketServer({ server });
 wss.on("connection", (connection, req) => {
@@ -568,7 +589,6 @@ app.post("/report/:id/comment", async (req, res) => {
     const { text } = req.body;
     const reportId = req.params.id;
 
-    // Obtener el usuario desde el token de autenticación
     const token = req.cookies?.token;
     if (!token) {
       return res.status(401).json({ error: "User not authenticated" });
@@ -581,20 +601,32 @@ app.post("/report/:id/comment", async (req, res) => {
       return res.status(404).json({ error: "Report not found" });
     }
 
+    const user = await User.findById(userId, 'username');
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
     const comment = {
       text,
       createdBy: userId,
+      createdAt: new Date(),
     };
 
     report.comments.push(comment);
     await report.save();
 
-    res.status(201).json(report);
+    const newComment = report.comments[report.comments.length - 1];
+    newComment.createdBy = user;
+    
+    io.to(reportId).emit('newComment', newComment); // Emitir evento a través de WebSocket
+
+    res.status(201).json(newComment);
   } catch (error) {
     console.error("Error adding comment:", error);
     res.status(500).json({ error: "Error adding comment" });
   }
 });
+
 
 // Ruta para obtener los comentarios de un reporte
 app.get("/report/:id/comments", async (req, res) => {
@@ -610,6 +642,74 @@ app.get("/report/:id/comments", async (req, res) => {
     res.status(500).json({ error: "Error fetching comments" });
   }
 });
+
+// Ruta para editar un comentario
+app.put("/report/:reportId/comment/:commentId", async (req, res) => {
+  try {
+    const { text } = req.body;
+    const { reportId, commentId } = req.params;
+
+    const report = await Report.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    const comment = report.comments.id(commentId);
+    if (!comment) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    const token = req.cookies?.token;
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    if (comment.createdBy.toString() !== decodedToken.userId) {
+      return res.status(403).json({ error: "User not authorized" });
+    }
+
+    comment.text = text;
+    await report.save();
+
+    const user = await User.findById(decodedToken.userId, 'username');
+    comment.createdBy = user;
+
+    io.to(reportId).emit('updateComment', comment); // Emitir evento a través de WebSocket
+
+    res.status(200).json(comment);
+  } catch (error) {
+    console.error("Error updating comment:", error);
+    res.status(500).json({ error: "Error updating comment" });
+  }
+});
+
+
+
+// Ruta para eliminar un comentario
+app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
+  try {
+    const { reportId, commentId } = req.params;
+
+    const report = await Report.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    const commentIndex = report.comments.findIndex(comment => comment._id.toString() === commentId);
+    if (commentIndex === -1) {
+      return res.status(404).json({ error: "Comment not found" });
+    }
+
+    report.comments.splice(commentIndex, 1);
+    await report.save();
+
+    io.to(reportId).emit('deleteComment', commentId); // Emitir evento a través de WebSocket
+
+    res.status(200).json({ message: "Comment deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting comment:", error);
+    res.status(500).json({ error: "Error deleting comment" });
+  }
+});
+
+
 
 
 
