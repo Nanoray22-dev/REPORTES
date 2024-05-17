@@ -51,9 +51,10 @@ const CreateReport = ({ onSubmit, onCloseModal }) => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0]; // Solo toma el primer archivo seleccionado
+    const file = e.target.files[0];
     setImage(file);
   };
+  
 
   // const handleImageRemove = (index) => {
   //   const newImages = [...image];

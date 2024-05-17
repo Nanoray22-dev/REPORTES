@@ -478,39 +478,43 @@ app.get("/report/:id", async (req, res) => {
 });
 
 
-app.post('/report', upload.array('images', 10), async (req, res) => {
+app.post("/report", upload.single("image"), async (req, res) => {
   try {
     const { title, description, state, incidentDate } = req.body;
 
-    let imagePaths = [];
-    if (req.files) {
-      imagePaths = req.files.map(file => file.path);
+    let imagePath = null;
+    if (req.file) {
+      imagePath = req.file.path;
     }
 
+    // Obtener el usuario desde el token de autenticación
     const token = req.cookies?.token;
     if (!token) {
-      return res.status(401).json({ error: 'User not authenticated' });
+      return res.status(401).json({ error: "User not authenticated" });
     }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decodedToken.userId;
 
+    // Crear el reporte con el usuario y la fecha de creación
     const newReport = await Report.create({
       title,
       description,
       state,
-      images: imagePaths,
+      image: imagePath,
       incidentDate,
-      createdBy: userId,
-      createdAt: new Date(),
+      createdBy: userId, // Establecer el usuario como creador del reporte
+      createdAt: new Date(), // Establecer la fecha de creación del reporte
     });
 
+    // Enviar la respuesta solo una vez al final del bloque try
     res.status(201).json(newReport);
   } catch (error) {
     console.error(error);
-    if (req.files) {
-      req.files.forEach(file => fs.unlinkSync(file.path));
+    // Si ocurrió un error, eliminar la imagen subida (si existe)
+    if (req.file) {
+      fs.unlinkSync(req.file.path);
     }
-    res.status(500).json({ error: 'Error creating report' });
+    res.status(500).json({ error: "Error creating report" });
   }
 });
 
