@@ -8,6 +8,8 @@ import CreateReport from "./CreateReport";
 import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
 import { TbEyeSearch, TbReportOff, TbSend } from "react-icons/tb";
+import { WiTime3 } from "react-icons/wi";
+
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -16,6 +18,7 @@ const ReportForm = ({ handleSubmit }) => {
   const itemsPerPage = 6; // Número de elementos por página
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
+  const [dateFilter, setDateFilter] = useState("all"); // Estado para el filtro de fechas
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -28,7 +31,6 @@ const ReportForm = ({ handleSubmit }) => {
     };
 
     fetchReports();
-    
   }, []);
 
   const handleDelete = async (reportId) => {
@@ -124,12 +126,35 @@ const ReportForm = ({ handleSubmit }) => {
     }
   };
 
+  // Función para filtrar los reportes según el rango de fechas seleccionado
+  const filterReportsByDate = (reports) => {
+    const now = new Date();
+    return reports.filter((report) => {
+      const reportDate = new Date(report.incidentDate);
+      switch (dateFilter) {
+        case "last_day":
+          return reportDate >= new Date(now.setDate(now.getDate() - 1));
+        case "last_7_days":
+          return reportDate >= new Date(now.setDate(now.getDate() - 7));
+        case "last_30_days":
+          return reportDate >= new Date(now.setDate(now.getDate() - 30));
+        case "last_month":
+          return reportDate >= new Date(now.setMonth(now.getMonth() - 1));
+        case "last_year":
+          return reportDate >= new Date(now.setFullYear(now.getFullYear() - 1));
+        default:
+          return true;
+      }
+    });
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  // const currentItems = reports.slice(indexOfFirstItem, indexOfLastItem);
   const filteredReports = reports.filter((report) =>
     report.createdBy.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const filteredAndDateFilteredReports = filterReportsByDate(filteredReports);
 
   const getsColorState = (state) => {
     switch (state) {
@@ -152,7 +177,7 @@ const ReportForm = ({ handleSubmit }) => {
     <>
       <Navigation />
       <div className="container mx-auto">
-        <div className=" flex items-center justify-evenly p-4">
+        <div className="flex items-center justify-evenly p-4">
           <div className="mt-4">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
@@ -166,7 +191,22 @@ const ReportForm = ({ handleSubmit }) => {
             >
               + Crear Reporte
             </button>
+            
           </div>
+          <div className="flex justify-center mt-4">
+          <select
+            value={dateFilter}
+            onChange={(e) => setDateFilter(e.target.value)}
+            className="bg-gray-200 outline-none py-2 px-4 rounded-xl"
+          >
+            <option value="all"> All</option>
+            <option value="last_day">Last Day</option>
+            <option value="last_7_days">Last 7 Days</option>
+            <option value="last_30_days">Last 30 Days</option>
+            <option value="last_month">Last Month</option>
+            <option value="last_year">Last Year</option>
+          </select>
+        </div>
           <div className="relative ml-auto mt-4">
             <RiSearch2Line className="absolute top-1/2 -translate-y-1/2 left-2" />
             <input
@@ -177,7 +217,10 @@ const ReportForm = ({ handleSubmit }) => {
               placeholder="Search for username"
             />
           </div>
+          
         </div>
+
+       
 
         {showModal && (
           <CreateReport
@@ -202,7 +245,7 @@ const ReportForm = ({ handleSubmit }) => {
               </tr>
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
-              {filteredReports
+              {filteredAndDateFilteredReports
                 .slice(indexOfFirstItem, indexOfLastItem)
                 .map((report, index) => (
                   <tr
@@ -250,24 +293,24 @@ const ReportForm = ({ handleSubmit }) => {
                               type="button"
                               onClick={() => handleView(report)}
                             >
-                             <TbEyeSearch className="text-xl"/>
-                             See report
+                              <TbEyeSearch className="text-xl" />
+                              See report
                             </button>
                           </li>
-                          <li><hr className="dropdown-divider"/></li>
+                          <li><hr className="dropdown-divider" /></li>
                           <li>
                             <button className="dropdown-item flex gap-2 text-red-500" type="button"
-                            onClick={() => handleDelete(report._id)}
+                              onClick={() => handleDelete(report._id)}
                             >
-                            <TbReportOff className="text-xl text-red-300" />
+                              <TbReportOff className="text-xl text-red-300" />
                               Delete
                             </button>
                           </li>
-                          <li><hr className="dropdown-divider"/></li>
+                          <li><hr className="dropdown-divider" /></li>
                           <li>
                             <button className="dropdown-item flex gap-2" type="button">
-                            <TbSend  className="text-xl"/>
-                              Send to 
+                              <TbSend className="text-xl" />
+                              Send to
                             </button>
                           </li>
                         </ul>
@@ -291,7 +334,7 @@ const ReportForm = ({ handleSubmit }) => {
             </div>
             <span className="text-gray-700 mx-2">of</span>
             <div className="text-gray-700 font-bold rounded">
-              {Math.ceil(reports.length / itemsPerPage)}
+              {Math.ceil(filteredAndDateFilteredReports.length / itemsPerPage)}
             </div>
           </div>
 
@@ -299,19 +342,17 @@ const ReportForm = ({ handleSubmit }) => {
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
-                currentPage === 1 ? "cursor-not-allowed" : ""
-              }`}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${currentPage === 1 ? "cursor-not-allowed" : ""
+                }`}
             >
               &#8592; {/* Flecha hacia la izquierda */}
             </button>
 
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={indexOfLastItem >= reports.length}
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
-                indexOfLastItem >= reports.length ? "cursor-not-allowed" : ""
-              }`}
+              disabled={indexOfLastItem >= filteredAndDateFilteredReports.length}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${indexOfLastItem >= filteredAndDateFilteredReports.length ? "cursor-not-allowed" : ""
+                }`}
             >
               &#8594; {/* Flecha hacia la derecha */}
             </button>

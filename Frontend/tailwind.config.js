@@ -4,8 +4,14 @@ export default {
   theme: {
     extend: {
       colors: {
-        customOrange: {
+        secondary: {
           100: "#fd8e00",
+          200: "#FB8E25"
+        },
+        third:{
+          100: "#1B385C",
+          200: "#1A375B",
+          300: "#344C6A"
         },
         primary: {
           100: "#3A00B0",

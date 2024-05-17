@@ -5,7 +5,7 @@ import { RiHashtag } from "react-icons/ri";
 import { FaLaptopHouse } from "react-icons/fa";
 import axios from "axios";
 import { Link, Outlet } from "react-router-dom";
-// import  logo from "/logo.png";
+import "../Styles/dashboard.css";
 
 function Dasboard({ username }) {
   const [recentReports, setRecentReports] = useState([]);
@@ -66,15 +66,7 @@ function Dasboard({ username }) {
 
     fetchReports();
   }, []);
-
-  // const fetchRecentMessages = async () => {
-  //   try {
-  //     const response = await axios.get("/recent-messages"); // Llamar a la nueva ruta del backend
-  //     setRecentMessages(response.data);
-  //   } catch (error) {
-  //     console.error("Error fetching recent messages:", error);
-  //   }
-  // };
+ 
 
   const getsColorState = (state) => {
     switch (state) {
@@ -157,13 +149,13 @@ function Dasboard({ username }) {
           </div>
 
           {/* New Reports to Review */}
-          <div className="col-span-1 md:col-span-2 flex flex-col justify-between">
-            <h1 className="text-2xl font-bold mb-8">New reports to review</h1>
+          <div className="col-span-1 md:col-span-2 flex flex-col justify-evenly">
+            <h1 className="text-2xl font-bold ">New reports to review</h1>
             <div className="bg-white p-8 rounded-xl shadow-lg">
               <div className="max-h-60 overflow-y-scroll">
                 {reports.length > 0 ? (
                   reports.map((report) => (
-                    <div key={report._id} className="bg-gray-100 p-4 rounded-md mb-4">
+                    <div key={report._id} className="bg-gray-100 p-4 rounded-md mb-4 borde">
                       <p className="text-gray-600">Reported by: {report.createdBy}</p>
                       <h3 className="font-bold text-lg">{report.title}</h3>
                       <button
@@ -183,7 +175,7 @@ function Dasboard({ username }) {
               </div>
               <div className="flex justify-end">
                 <Link to="/reporte">
-                  <button className="hover:text-white transition-colors bg-customOrange-100/40 px-2 p-2 rounded-xl">
+                  <button className="hover:text-white transition-colors bg-secondary-100/40 px-2 p-2 rounded-xl mt-4 ">
                     See all reports
                   </button>
                 </Link>
@@ -198,7 +190,7 @@ function Dasboard({ username }) {
           <div>
             <h1 className="text-2xl font-bold mb-4">Recent Reports</h1>
             {recentReports.slice(-2).map((report, index) => (
-              <div key={index} className="bg-white p-8 rounded-xl shadow-lg mb-8">
+              <div key={index} className="bg-white p-8 rounded-xl shadow-lg mb-8 boder">
                 {/* Report Details */}
                 <div className="grid grid-cols-1 xl:grid-cols-4 items-center gap-4 mb-4">
                   <div className="col-span-2 flex items-center gap-4">
