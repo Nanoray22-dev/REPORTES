@@ -7,7 +7,6 @@ const CreateReport = ({ onSubmit, onCloseModal }) => {
   const [description, setDescription] = useState("");
   const [image, setImage] = useState([]);
   const [incidentDate, setIncidentDate] = useState("");
-  const [, setRedirect] = useState(false);
   const [reports, setReports] = useState([]);
   const [selectedState] = useState("PENDING");
 
@@ -37,13 +36,13 @@ const CreateReport = ({ onSubmit, onCloseModal }) => {
         timer: 1000,
       });
 
-      setRedirect(true);
+
       setTitle("");
       setDescription("");
       setImage(null);
       setIncidentDate("");
 
-      onSubmit();
+      onSubmit(response.data);
       onCloseModal();
     } catch (error) {
       console.error("Error creating report:", error);
