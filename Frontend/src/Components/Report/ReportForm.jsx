@@ -178,7 +178,7 @@ const ReportForm = ({ handleSubmit }) => {
       <Navigation />
       <div className="container mx-auto">
         <div className="flex items-center justify-evenly p-4">
-          <div className="mt-4">
+          <div className="">
             <button
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
               onClick={handleExport}
@@ -193,7 +193,7 @@ const ReportForm = ({ handleSubmit }) => {
             </button>
             
           </div>
-          <div className="flex justify-center mt-4">
+          <div className="flex justify-center ">
           <select
             value={dateFilter}
             onChange={(e) => setDateFilter(e.target.value)}
@@ -207,7 +207,7 @@ const ReportForm = ({ handleSubmit }) => {
             <option value="last_year">Last Year</option>
           </select>
         </div>
-          <div className="relative ml-auto mt-4">
+          <div className="relative ml-auto ">
             <RiSearch2Line className="absolute top-1/2 -translate-y-1/2 left-2" />
             <input
               value={searchTerm}
@@ -234,7 +234,7 @@ const ReportForm = ({ handleSubmit }) => {
           </h4>
         </div>
         <div className="max-h-[450px] overflow-y-auto">
-          <table className="w-full bg-white shadow-md rounded-lg">
+          <table className="w-full bg-gray-200 shadow-md rounded-lg">
             <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
               <tr>
                 <th className="px-6 py-3 bg-gray-50 text-left">Created by</th>
