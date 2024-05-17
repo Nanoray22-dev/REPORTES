@@ -248,24 +248,166 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const baseUrl = "http://localhost:4040/";
 
+
+
 // app.get("/report", async (req, res) => {
 //   try {
-//     const reports = await Report.find().populate("createdBy", "username");
-//     const reportsWithUsername = reports.map(report => ({
-//       ...report.toObject(),
-//       createdBy: report.createdBy.username, // Reemplaza el ID del usuario con su nombre de usuario
-//       image: report.image ? `${baseUrl}${report.image}` : null
-//     }));
-//     res.json(reportsWithUsername);
+//     // Obtén el usuario desde el token de autenticación
+//     const token = req.cookies?.token;
+//     if (!token) {
+//       return res.status(401).json({ error: "User not authenticated" });
+//     }
+//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+//     const userId = decodedToken.userId;
+
+//     // Verifica el rol del usuario
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     // Si el usuario es administrador, devuelve todos los reportes
+//     if (user.role === "admin") {
+//       const reports = await Report.find().populate("createdBy", "username");
+//       const reportsWithUsername = reports.map((report) => ({
+//         ...report.toObject(),
+//         createdBy: report.createdBy.username,
+//         image: report.image ? `${baseUrl}${report.image}` : null,
+//       }));
+//       return res.json(reportsWithUsername);
+//     } else {
+//       // Si el usuario no es administrador, devuelve solo los reportes creados por ese usuario
+//       const reports = await Report.find({ createdBy: userId }).populate(
+//         "createdBy",
+//         "username"
+//       );
+//       const reportsWithUsername = reports.map((report) => ({
+//         ...report.toObject(),
+//         createdBy: report.createdBy.username,
+//         image: report.image ? `${baseUrl}${report.image}` : null,
+//       }));
+//       return res.json(reportsWithUsername);
+//     }
 //   } catch (error) {
 //     console.error(error);
-//     res.status(500).json({ error: "Error fetching reports" });
+//     return res.status(500).json({ error: "Error fetching reports" });
 //   }
 // });
 
+// app.post("/report", upload.single("image"), async (req, res) => {
+//   try {
+//     const { title, description, state, incidentDate } = req.body;
+
+//     let imagePath = null;
+//     if (req.file) {
+//       imagePath = req.file.path;
+//     }
+
+//     // Obtener el usuario desde el token de autenticación
+//     const token = req.cookies?.token;
+//     if (!token) {
+//       return res.status(401).json({ error: "User not authenticated" });
+//     }
+//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+//     const userId = decodedToken.userId;
+
+//     // Crear el reporte con el usuario y la fecha de creación
+//     const newReport = await Report.create({
+//       title,
+//       description,
+//       state,
+//       image: imagePath,
+//       incidentDate,
+//       createdBy: userId, // Establecer el usuario como creador del reporte
+//       createdAt: new Date(), // Establecer la fecha de creación del reporte
+//     });
+
+//     // Enviar la respuesta solo una vez al final del bloque try
+//     res.status(201).json(newReport);
+//   } catch (error) {
+//     console.error(error);
+//     // Si ocurrió un error, eliminar la imagen subida (si existe)
+//     if (req.file) {
+//       fs.unlinkSync(req.file.path);
+//     }
+//     res.status(500).json({ error: "Error creating report" });
+//   }
+// });
+
+// app.post("/report", upload.array("image"), async (req, res) => {
+//   try {
+//     const { title, description, state, incidentDate } = req.body;
+
+//     let imagePath = null;
+//     if (req.file) {
+//       imagePath = req.file.path;
+//     }
+
+//     // Obtener el usuario desde el token de autenticación
+//     const token = req.cookies?.token;
+//     if (!token) {
+//       return res.status(401).json({ error: "User not authenticated" });
+//     }
+//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+//     const userId = decodedToken.userId;
+
+//     // Crear el reporte con el usuario y la fecha de creación
+//     const newReport = await Report.create({
+//       title,
+//       description,
+//       state,
+//       image: imagePath,
+//       incidentDate,
+//       createdBy: userId, // Establecer el usuario como creador del reporte
+//       createdAt: new Date(), // Establecer la fecha de creación del reporte
+//     });
+
+//     // Enviar la respuesta solo una vez al final del bloque try
+//     res.status(201).json(newReport);
+//   } catch (error) {
+//     console.error(error);
+//     // Si ocurrió un error, eliminar la imagen subida (si existe)
+//     if (req.file) {
+//       fs.unlinkSync(req.file.path);
+//     }
+//     res.status(500).json({ error: "Error creating report" });
+//   }
+// });
+// app.get("/report", async (req, res) => {
+//   try {
+//     const token = req.cookies?.token;
+//     if (!token) {
+//       return res.status(401).json({ error: "User not authenticated" });
+//     }
+//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+//     const userId = decodedToken.userId;
+
+//     const user = await User.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     let reports;
+//     if (user.role === "admin") {
+//       reports = await Report.find().populate("createdBy", "username");
+//     } else {
+//       reports = await Report.find({ createdBy: userId }).populate("createdBy", "username");
+//     }
+
+//     const reportsWithUsername = reports.map((report) => ({
+//       ...report.toObject(),
+//       createdBy: report.createdBy.username,
+//       images: report.images ? report.images.map(image => `${baseUrl}${image}`) : [],
+//     }));
+    
+//     return res.json(reportsWithUsername);
+//   } catch (error) {
+//     console.error(error);
+//     return res.status(500).json({ error: "Error fetching reports" });
+//   }
+// });
 app.get("/report", async (req, res) => {
   try {
-    // Obtén el usuario desde el token de autenticación
     const token = req.cookies?.token;
     if (!token) {
       return res.status(401).json({ error: "User not authenticated" });
@@ -273,77 +415,66 @@ app.get("/report", async (req, res) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decodedToken.userId;
 
-    // Verifica el rol del usuario
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    // Si el usuario es administrador, devuelve todos los reportes
+    let reports;
     if (user.role === "admin") {
-      const reports = await Report.find().populate("createdBy", "username");
-      const reportsWithUsername = reports.map((report) => ({
-        ...report.toObject(),
-        createdBy: report.createdBy.username,
-        image: report.image ? `${baseUrl}${report.image}` : null,
-      }));
-      return res.json(reportsWithUsername);
+      reports = await Report.find().populate("createdBy", "username").populate("comments.createdBy", "username");
     } else {
-      // Si el usuario no es administrador, devuelve solo los reportes creados por ese usuario
-      const reports = await Report.find({ createdBy: userId }).populate(
-        "createdBy",
-        "username"
-      );
-      const reportsWithUsername = reports.map((report) => ({
-        ...report.toObject(),
-        createdBy: report.createdBy.username,
-        image: report.image ? `${baseUrl}${report.image}` : null,
-      }));
-      return res.json(reportsWithUsername);
+      reports = await Report.find({ createdBy: userId }).populate("createdBy", "username").populate("comments.createdBy", "username");
     }
+
+    const reportsWithDetails = reports.map(report => ({
+      ...report.toObject(),
+      createdBy: report.createdBy.username,
+      image: report.image ? `${baseUrl}${report.image}` : null,
+    }));
+
+    res.json(reportsWithDetails);
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: "Error fetching reports" });
+    res.status(500).json({ error: "Error fetching reports" });
   }
 });
 
-app.post("/report", upload.single("image"), async (req, res) => {
+
+
+app.post('/report', upload.array('images', 10), async (req, res) => {
   try {
     const { title, description, state, incidentDate } = req.body;
 
-    let imagePath = null;
-    if (req.file) {
-      imagePath = req.file.path;
+    let imagePaths = [];
+    if (req.files) {
+      imagePaths = req.files.map(file => file.path);
     }
 
-    // Obtener el usuario desde el token de autenticación
     const token = req.cookies?.token;
     if (!token) {
-      return res.status(401).json({ error: "User not authenticated" });
+      return res.status(401).json({ error: 'User not authenticated' });
     }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decodedToken.userId;
 
-    // Crear el reporte con el usuario y la fecha de creación
     const newReport = await Report.create({
       title,
       description,
       state,
-      image: imagePath,
+      images: imagePaths,
       incidentDate,
-      createdBy: userId, // Establecer el usuario como creador del reporte
-      createdAt: new Date(), // Establecer la fecha de creación del reporte
+      createdBy: userId,
+      createdAt: new Date(),
     });
 
-    // Enviar la respuesta solo una vez al final del bloque try
     res.status(201).json(newReport);
   } catch (error) {
     console.error(error);
-    // Si ocurrió un error, eliminar la imagen subida (si existe)
-    if (req.file) {
-      fs.unlinkSync(req.file.path);
+    if (req.files) {
+      req.files.forEach(file => fs.unlinkSync(file.path));
     }
-    res.status(500).json({ error: "Error creating report" });
+    res.status(500).json({ error: 'Error creating report' });
   }
 });
 
@@ -358,21 +489,7 @@ app.delete("/report/:id", async (req, res) => {
   }
 });
 
-// app.put("/report/:id", async (req, res) => {
-//   try {
-//     const reportId = req.params.id;
-//     const { title, description, state, incidentDate } = req.body;
-//     const updatedReport = await Report.findByIdAndUpdate(
-//       reportId,
-//       { title, description, state, incidentDate },
-//       { new: true }
-//     );
-//     res.status(200).json(updatedReport);
-//   } catch (error) {
-//     console.error("Error updating report:", error);
-//     res.status(500).json({ error: "Error updating report" });
-//   }
-// });
+
 
 app.put("/report/:id", async (req, res) => {
   try {
@@ -409,30 +526,7 @@ app.put("/report/:id", async (req, res) => {
   }
 });
 
-// const httpServer = require('http').createServer(app);
-// const io = require('socket.io')(httpServer);
 
-// io.on('connection', (socket) => {
-//   console.log('A user connected');
-
-//   // Manejar eventos de actualización de reportes
-//   socket.on('reportUpdated', (report) => {
-//     io.emit('reportUpdated', report); // Emitir el evento a todos los clientes conectados
-//   });
-
-//   socket.on('disconnect', () => {
-//     console.log('User disconnected');
-//   });
-// });
-
-
-// Envío de notificaciones: Función para enviar notificaciones cuando se asigna un informe
-async function sendNotificationToUser(reportId, userId) {
-  const user = await User.findById(userId);
-  const report = await Report.findById(reportId);
-  // Aquí puedes enviar la notificación al usuario, ya sea por correo electrónico, notificación push, etc.
-  console.log(`Se te ha asignado el informe "${report.title}"`);
-}
 
 
 app.post("/assign-report/:reportId", async (req, res) => {
@@ -467,6 +561,61 @@ app.put("/mark-report-reviewed/:reportId", async (req, res) => {
     res.status(500).json({ error: "Error marcando informe como revisado" });
   }
 });
+
+// Ruta para agregar un comentario a un reporte
+app.post("/report/:id/comment", async (req, res) => {
+  try {
+    const { text } = req.body;
+    const reportId = req.params.id;
+
+    // Obtener el usuario desde el token de autenticación
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+
+    const report = await Report.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+
+    const comment = {
+      text,
+      createdBy: userId,
+    };
+
+    report.comments.push(comment);
+    await report.save();
+
+    res.status(201).json(report);
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    res.status(500).json({ error: "Error adding comment" });
+  }
+});
+
+// Ruta para obtener los comentarios de un reporte
+app.get("/report/:id/comments", async (req, res) => {
+  try {
+    const reportId = req.params.id;
+    const report = await Report.findById(reportId).populate("comments.createdBy", "username");
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+    res.status(200).json(report.comments);
+  } catch (error) {
+    console.error("Error fetching comments:", error);
+    res.status(500).json({ error: "Error fetching comments" });
+  }
+});
+
+
+
+
+
+
 
 async function assignReportAndNotify(reportId, userId) {
   try {
