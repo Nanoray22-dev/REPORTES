@@ -120,7 +120,7 @@ function Profile({ username, setIsLoggedIn }) {
                       />
                     }
                   >
-                    Social Reports
+                   <Link to={"/comment"}>Social Reports</Link>
                   </Menu.Item>
                   <Menu.Item
                     leftSection={

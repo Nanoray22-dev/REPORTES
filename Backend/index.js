@@ -15,7 +15,7 @@ const path = require("path");
 const axios = require("axios");
 const bodyParser = require('body-parser');
 const socketIo = require('socket.io');
-// const server = http.createServer(app);
+const ObjectId = mongoose.Types.ObjectId;
 
 dotenv.config();
 mongoose
@@ -461,6 +461,21 @@ app.get("/report", async (req, res) => {
   }
 });
 
+// Ruta para obtener los detalles de un reporte específico
+app.get("/report/:id", async (req, res) => {
+  try {
+    const reportId = req.params.id;
+    // Lógica para buscar el reporte en la base de datos utilizando el reportId
+    const report = await Report.findById(reportId);
+    if (!report) {
+      return res.status(404).json({ error: "Report not found" });
+    }
+    res.json(report);
+  } catch (error) {
+    console.error("Error fetching report details:", error);
+    res.status(500).json({ error: "Error fetching report details" });
+  }
+});
 
 
 app.post('/report', upload.array('images', 10), async (req, res) => {
@@ -710,6 +725,37 @@ app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
 });
 
 
+// app.get('/user/:userId/reports', async (req, res) => {
+//   try {
+//     const userId = req.params.userId;
+//     if (!mongoose.Types.ObjectId.isValid(userId)) {
+//       return res.status(400).json({ error: 'Invalid user ID' });
+//     }
+
+//     const reports = await Report.find({ createdBy: mongoose.Types.ObjectId(userId) });
+//     res.status(200).json(reports);
+//   } catch (error) {
+//     console.error('Error fetching user reports:', error);
+//     res.status(500).json({ error: 'Error fetching user reports' });
+//   }
+// });
+
+
+app.get("/user/:userId/reports", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    const reports = await Report.find({ createdBy: userId });
+
+    res.status(200).json(reports);
+  } catch (error) {
+    console.error("Error fetching user reports:", error);
+    res.status(500).json({ error: "Error fetching user reports" });
+  }
+});
 
 
 

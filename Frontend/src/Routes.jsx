@@ -11,6 +11,7 @@ import AccessDeniedPage from "./Components/Security/AccessDeniedPage";
 import Profile from "./Components/Profile/Profile";
 import ChangePassword from "./Components/Security/ChangePassword";
 import AssignReport from "./Components/Report/AssignReport";
+import SocialReports from "./Components/Profile/SocialReports";
 
 export default function Rutas() {
   const { username , role} = useContext(UserContext);
@@ -26,6 +27,8 @@ export default function Rutas() {
       <Route path="/change-password" element={<ChangePassword />} />
       <Route path="/chat" element={<Chat />} />
       <Route path="/assign" element={<AssignReport  />} />
+      <Route path="/comment" element={<SocialReports  />} />
+
       <Route path="/access-denied" element={<AccessDeniedPage />} />
 
       {/* <Route path="*" element={<Navigate to="/access-denied" />} /> */}

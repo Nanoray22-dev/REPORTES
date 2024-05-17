@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import io from 'socket.io-client';
@@ -42,20 +42,24 @@ const CommentSection = ({ reportId }) => {
       socket.emit('leaveReport', reportId);
       socket.disconnect();
     };
-  }, [reportId, socket]);
+  }, [reportId, socket]); // Agregar socket como dependencia
 
   const handleAddComment = async () => {
     try {
       const response = await axios.post(`/report/${reportId}/comment`, { text: newComment });
+      // Utiliza el valor de response si es necesario
+      console.log(response.data); 
       setNewComment('');
     } catch (error) {
       console.error("Error adding comment", error);
     }
   };
-
+  
   const handleEditComment = async (commentId) => {
     try {
       const response = await axios.put(`/report/${reportId}/comment/${commentId}`, { text: editingText });
+      // Utiliza el valor de response si es necesario
+      console.log(response.data); 
       setEditingCommentId(null);
       setEditingText('');
     } catch (error) {
