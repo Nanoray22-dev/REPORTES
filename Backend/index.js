@@ -13,8 +13,8 @@ const fs = require("fs");
 const multer = require("multer");
 const path = require("path");
 const axios = require("axios");
-const bodyParser = require('body-parser');
-const socketIo = require('socket.io');
+const bodyParser = require("body-parser");
+const socketIo = require("socket.io");
 const ObjectId = mongoose.Types.ObjectId;
 
 dotenv.config();
@@ -43,18 +43,18 @@ app.use(
 const server = app.listen(4040);
 const io = socketIo(server);
 // WebSockets
-io.on('connection', (socket) => {
-  console.log('New client connected');
+io.on("connection", (socket) => {
+  console.log("New client connected");
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
   });
 
-  socket.on('joinReport', (reportId) => {
+  socket.on("joinReport", (reportId) => {
     socket.join(reportId);
   });
 
-  socket.on('leaveReport', (reportId) => {
+  socket.on("leaveReport", (reportId) => {
     socket.leave(reportId);
   });
 });
@@ -118,7 +118,7 @@ app.post("/login", async (req, res) => {
         (err, token) => {
           res.cookie("token", token, { sameSite: "none", secure: true }).json({
             id: foundUser._id,
-            role: foundUser.role
+            role: foundUser.role,
           });
         }
       );
@@ -157,8 +157,6 @@ app.post("/register", async (req, res) => {
 app.post("/logout", (req, res) => {
   res.cookie("token", "", { sameSite: "none", secure: true }).json("ok");
 });
-
-
 
 const wss = new ws.WebSocketServer({ server });
 wss.on("connection", (connection, req) => {
@@ -267,9 +265,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-const baseUrl = "http://localhost:4040/";
-
-
+const baseUrl = process.env.BASE_URL;
 
 // app.get("/report", async (req, res) => {
 //   try {
@@ -420,7 +416,7 @@ const baseUrl = "http://localhost:4040/";
 //       createdBy: report.createdBy.username,
 //       images: report.images ? report.images.map(image => `${baseUrl}${image}`) : [],
 //     }));
-    
+
 //     return res.json(reportsWithUsername);
 //   } catch (error) {
 //     console.error(error);
@@ -443,12 +439,16 @@ app.get("/report", async (req, res) => {
 
     let reports;
     if (user.role === "admin") {
-      reports = await Report.find().populate("createdBy", "username").populate("comments.createdBy", "username");
+      reports = await Report.find()
+        .populate("createdBy", "username")
+        .populate("comments.createdBy", "username");
     } else {
-      reports = await Report.find({ createdBy: userId }).populate("createdBy", "username").populate("comments.createdBy", "username");
+      reports = await Report.find({ createdBy: userId })
+        .populate("createdBy", "username")
+        .populate("comments.createdBy", "username");
     }
 
-    const reportsWithDetails = reports.map(report => ({
+    const reportsWithDetails = reports.map((report) => ({
       ...report.toObject(),
       createdBy: report.createdBy.username,
       image: report.image ? `${baseUrl}${report.image}` : null,
@@ -461,11 +461,40 @@ app.get("/report", async (req, res) => {
   }
 });
 
-// Ruta para obtener los detalles de un reporte específico
+app.get("/reports", async (req, res) => {
+  try {
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decodedToken.userId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const reports = await Report.find()
+      .populate("createdBy", "username")
+      .populate("comments.createdBy", "username");
+
+    const reportsWithDetails = reports.map((report) => ({
+      ...report.toObject(),
+      createdBy: report.createdBy.username,
+      image: report.image ? `${baseUrl}${report.image}` : null,
+    }));
+
+    res.json(reportsWithDetails);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error fetching reports" });
+  }
+});
+
 app.get("/report/:id", async (req, res) => {
   try {
     const reportId = req.params.id;
-    // Lógica para buscar el reporte en la base de datos utilizando el reportId
     const report = await Report.findById(reportId);
     if (!report) {
       return res.status(404).json({ error: "Report not found" });
@@ -477,7 +506,6 @@ app.get("/report/:id", async (req, res) => {
   }
 });
 
-
 app.post("/report", upload.single("image"), async (req, res) => {
   try {
     const { title, description, state, incidentDate } = req.body;
@@ -487,7 +515,6 @@ app.post("/report", upload.single("image"), async (req, res) => {
       imagePath = req.file.path;
     }
 
-    // Obtener el usuario desde el token de autenticación
     const token = req.cookies?.token;
     if (!token) {
       return res.status(401).json({ error: "User not authenticated" });
@@ -495,22 +522,27 @@ app.post("/report", upload.single("image"), async (req, res) => {
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const userId = decodedToken.userId;
 
-    // Crear el reporte con el usuario y la fecha de creación
     const newReport = await Report.create({
       title,
       description,
       state,
       image: imagePath,
       incidentDate,
-      createdBy: userId, // Establecer el usuario como creador del reporte
-      createdAt: new Date(), // Establecer la fecha de creación del reporte
+      createdBy: userId,
+      createdAt: new Date(),
     });
 
-    // Enviar la respuesta solo una vez al final del bloque try
-    res.status(201).json(newReport);
+    const reportWithDetails = {
+      ...newReport.toObject(),
+      createdBy: (await User.findById(userId)).username,
+      image: imagePath ? `${baseUrl}${imagePath}` : null,
+    };
+
+    io.emit("new-report", reportWithDetails);
+
+    res.status(201).json(reportWithDetails);
   } catch (error) {
     console.error(error);
-    // Si ocurrió un error, eliminar la imagen subida (si existe)
     if (req.file) {
       fs.unlinkSync(req.file.path);
     }
@@ -522,6 +554,7 @@ app.delete("/report/:id", async (req, res) => {
   try {
     const reportId = req.params.id;
     await Report.findByIdAndDelete(reportId);
+    io.emit("delete-report", reportId);
     res.status(200).json({ message: "Report deleted successfully" });
   } catch (error) {
     console.error("Error deleting report:", error);
@@ -529,14 +562,11 @@ app.delete("/report/:id", async (req, res) => {
   }
 });
 
-
-
 app.put("/report/:id", async (req, res) => {
   try {
     const reportId = req.params.id;
     const { title, description, state, incidentDate } = req.body;
 
-    // Verificar el rol del usuario
     const token = req.cookies?.token;
     if (!token) {
       return res.status(401).json({ error: "User not authenticated" });
@@ -545,29 +575,32 @@ app.put("/report/:id", async (req, res) => {
     const userId = decodedToken.userId;
     const user = await User.findById(userId);
 
-    // Verificar si el usuario es administrador
     if (user.role !== "admin") {
-      // Si no es administrador, enviar un error
       return res
         .status(403)
         .json({ error: "User is not authorized to update report state" });
     }
 
-    // Si el usuario es administrador, actualizar el reporte
     const updatedReport = await Report.findByIdAndUpdate(
       reportId,
       { title, description, state, incidentDate },
       { new: true }
     );
-    res.status(200).json(updatedReport);
+
+    const reportWithDetails = {
+      ...updatedReport.toObject(),
+      createdBy: (await User.findById(updatedReport.createdBy)).username,
+      image: updatedReport.image ? `${baseUrl}${updatedReport.image}` : null,
+    };
+
+    io.emit("update-report", reportWithDetails);
+
+    res.status(200).json(reportWithDetails);
   } catch (error) {
     console.error("Error updating report:", error);
     res.status(500).json({ error: "Error updating report" });
   }
 });
-
-
-
 
 app.post("/assign-report/:reportId", async (req, res) => {
   try {
@@ -620,7 +653,7 @@ app.post("/report/:id/comment", async (req, res) => {
       return res.status(404).json({ error: "Report not found" });
     }
 
-    const user = await User.findById(userId, 'username');
+    const user = await User.findById(userId, "username");
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
@@ -636,8 +669,8 @@ app.post("/report/:id/comment", async (req, res) => {
 
     const newComment = report.comments[report.comments.length - 1];
     newComment.createdBy = user;
-    
-    io.to(reportId).emit('newComment', newComment); // Emitir evento a través de WebSocket
+
+    io.to(reportId).emit("newComment", newComment); // Emitir evento a través de WebSocket
 
     res.status(201).json(newComment);
   } catch (error) {
@@ -646,12 +679,14 @@ app.post("/report/:id/comment", async (req, res) => {
   }
 });
 
-
 // Ruta para obtener los comentarios de un reporte
 app.get("/report/:id/comments", async (req, res) => {
   try {
     const reportId = req.params.id;
-    const report = await Report.findById(reportId).populate("comments.createdBy", "username");
+    const report = await Report.findById(reportId).populate(
+      "comments.createdBy",
+      "username"
+    );
     if (!report) {
       return res.status(404).json({ error: "Report not found" });
     }
@@ -687,10 +722,10 @@ app.put("/report/:reportId/comment/:commentId", async (req, res) => {
     comment.text = text;
     await report.save();
 
-    const user = await User.findById(decodedToken.userId, 'username');
+    const user = await User.findById(decodedToken.userId, "username");
     comment.createdBy = user;
 
-    io.to(reportId).emit('updateComment', comment); // Emitir evento a través de WebSocket
+    io.to(reportId).emit("updateComment", comment); // Emitir evento a través de WebSocket
 
     res.status(200).json(comment);
   } catch (error) {
@@ -698,8 +733,6 @@ app.put("/report/:reportId/comment/:commentId", async (req, res) => {
     res.status(500).json({ error: "Error updating comment" });
   }
 });
-
-
 
 // Ruta para eliminar un comentario
 app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
@@ -711,7 +744,9 @@ app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
       return res.status(404).json({ error: "Report not found" });
     }
 
-    const commentIndex = report.comments.findIndex(comment => comment._id.toString() === commentId);
+    const commentIndex = report.comments.findIndex(
+      (comment) => comment._id.toString() === commentId
+    );
     if (commentIndex === -1) {
       return res.status(404).json({ error: "Comment not found" });
     }
@@ -719,7 +754,7 @@ app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
     report.comments.splice(commentIndex, 1);
     await report.save();
 
-    io.to(reportId).emit('deleteComment', commentId); // Emitir evento a través de WebSocket
+    io.to(reportId).emit("deleteComment", commentId); // Emitir evento a través de WebSocket
 
     res.status(200).json({ message: "Comment deleted successfully" });
   } catch (error) {
@@ -727,7 +762,6 @@ app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
     res.status(500).json({ error: "Error deleting comment" });
   }
 });
-
 
 // app.get('/user/:userId/reports', async (req, res) => {
 //   try {
@@ -743,7 +777,6 @@ app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
 //     res.status(500).json({ error: 'Error fetching user reports' });
 //   }
 // });
-
 
 app.get("/user/:userId/reports", async (req, res) => {
   try {
@@ -761,12 +794,6 @@ app.get("/user/:userId/reports", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
 async function assignReportAndNotify(reportId, userId) {
   try {
     // Asignar el informe al usuario especificado
@@ -781,17 +808,6 @@ async function assignReportAndNotify(reportId, userId) {
     throw new Error("Error asignando informe");
   }
 }
-
-
-
-
-
-
-
-
-
-
-
 
 /////////////////////////////////////////////////////////////////
 // iniciando la parte del Usuario (residente o administrador) //
@@ -912,12 +928,11 @@ app.get("/user", async (req, res) => {
   }
 });
 
-
 app.post("/change-password", authenticateJWT, async (req, res) => {
   try {
     const { currentPassword, newPassword } = req.body;
     const userId = req.user.userId;
-    
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: "User not found" });
@@ -939,12 +954,6 @@ app.post("/change-password", authenticateJWT, async (req, res) => {
     res.status(500).json({ error: "Error updating password" });
   }
 });
-
-
-
-
-
-
 
 async function getUserDataFromRequest(req) {
   return new Promise((resolve) => {
@@ -1032,7 +1041,7 @@ async function authenticateJWT(req, res, next) {
     const token = req.cookies?.token;
     if (token) {
       const decodedToken = jwt.verify(token, jwtSecret);
-      req.user = decodedToken; 
+      req.user = decodedToken;
       next();
     } else {
       throw new Error("Token not provided");
@@ -1043,10 +1052,8 @@ async function authenticateJWT(req, res, next) {
   }
 }
 
-
-
 // Importa la biblioteca 'resend'
-const { Resend } = require('resend');
+const { Resend } = require("resend");
 
 // // Configura la clave de la API de Resend
 // const resend = new Resend('re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1');
@@ -1068,30 +1075,27 @@ const { Resend } = require('resend');
 //     console.error('Error sending email:', error);
 //   });
 
-
-
-const resend = new Resend('re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1');
+const resend = new Resend("re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1");
 
 // Define la ruta para enviar el correo de recuperación de contraseña
-app.post('/api/sendPasswordRecoveryEmail', async (req, res) => {
+app.post("/api/sendPasswordRecoveryEmail", async (req, res) => {
   const { email } = req.body;
 
   // Define las opciones del correo electrónico
   const emailOptions = {
-    from: 'onboarding@resend.dev',
+    from: "onboarding@resend.dev",
     to: email,
-    subject: 'Recuperación de Contraseña',
-    html: '<p>Hola, has solicitado restablecer tu contraseña. Sigue este enlace para restablecerla: <a href="http://example.com/reset-password">Restablecer Contraseña</a></p>'
+    subject: "Recuperación de Contraseña",
+    html: '<p>Hola, has solicitado restablecer tu contraseña. Sigue este enlace para restablecerla: <a href="http://example.com/reset-password">Restablecer Contraseña</a></p>',
   };
-
 
   // Envía el correo electrónico
   try {
     const response = await resend.emails.send(emailOptions);
-    console.log('Email sent successfully:', response);
-    res.json({ message: 'Email enviado exitosamente.' });
+    console.log("Email sent successfully:", response);
+    res.json({ message: "Email enviado exitosamente." });
   } catch (error) {
-    console.error('Error sending email:', error);
-    res.status(500).json({ message: 'Error al enviar el correo electrónico.' });
+    console.error("Error sending email:", error);
+    res.status(500).json({ message: "Error al enviar el correo electrónico." });
   }
 });
