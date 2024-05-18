@@ -635,6 +635,7 @@ app.put("/mark-report-reviewed/:reportId", async (req, res) => {
   }
 });
 
+
 // Ruta para agregar un comentario a un reporte
 app.post("/report/:id/comment", async (req, res) => {
   try {
@@ -670,7 +671,7 @@ app.post("/report/:id/comment", async (req, res) => {
     const newComment = report.comments[report.comments.length - 1];
     newComment.createdBy = user;
 
-    io.to(reportId).emit("newComment", newComment); // Emitir evento a través de WebSocket
+    io.to(reportId).emit("newComment", newComment); 
 
     res.status(201).json(newComment);
   } catch (error) {
@@ -678,6 +679,8 @@ app.post("/report/:id/comment", async (req, res) => {
     res.status(500).json({ error: "Error adding comment" });
   }
 });
+
+
 
 // Ruta para obtener los comentarios de un reporte
 app.get("/report/:id/comments", async (req, res) => {
@@ -696,6 +699,24 @@ app.get("/report/:id/comments", async (req, res) => {
     res.status(500).json({ error: "Error fetching comments" });
   }
 });
+
+// app.get("/report/:id/comments", async (req, res) => {
+//   try {
+//     const reportId = req.params.id;
+//     const report = await Report.findById(reportId).populate(
+//       "comments.createdBy",
+//       "username"
+//     );
+//     if (!report) {
+//       return res.status(404).json({ error: "Report not found" });
+//     }
+//     res.status(200).json(report.comments);
+//   } catch (error) {
+//     console.error("Error fetching comments:", error);
+//     res.status(500).json({ error: "Error fetching comments" });
+//   }
+// });
+
 
 // Ruta para editar un comentario
 app.put("/report/:reportId/comment/:commentId", async (req, res) => {
@@ -1097,5 +1118,36 @@ app.post("/api/sendPasswordRecoveryEmail", async (req, res) => {
   } catch (error) {
     console.error("Error sending email:", error);
     res.status(500).json({ message: "Error al enviar el correo electrónico." });
+  }
+});
+
+
+// Middleware para verificar el token de autenticación
+const authenticateUser = (req, res, next) => {
+  try {
+    const token = req.cookies?.token;
+    if (!token) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    req.userId = decodedToken.userId;
+    next();
+  } catch (error) {
+    return res.status(401).json({ error: "Invalid token" });
+  }
+};
+
+// Endpoint para obtener los datos del usuario actual
+app.get("/user/me", authenticateUser, async (req, res) => {
+  try {
+    const userId = req.userId;
+    const user = await User.findById(userId).select("-password"); // Excluir el campo de la contraseña
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    console.error("Error fetching current user data:", error);
+    res.status(500).json({ error: "Error fetching current user data" });
   }
 });

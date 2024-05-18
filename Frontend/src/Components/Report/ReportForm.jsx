@@ -9,7 +9,6 @@ import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
 import { TbEyeSearch, TbReportOff, TbSend } from "react-icons/tb";
 
-
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
@@ -246,6 +245,8 @@ const ReportForm = ({ handleSubmit }) => {
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
               {filteredAndDateFilteredReports
+                .slice()
+                .reverse() 
                 .slice(indexOfFirstItem, indexOfLastItem)
                 .map((report, index) => (
                   <tr

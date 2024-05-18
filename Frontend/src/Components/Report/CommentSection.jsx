@@ -8,6 +8,8 @@ const CommentSection = ({ reportId }) => {
   const [newComment, setNewComment] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingText, setEditingText] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+
   const socket = io();
 
   useEffect(() => {
@@ -19,30 +21,44 @@ const CommentSection = ({ reportId }) => {
         console.error("Error fetching comments", error);
       }
     };
-
+  
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/user/me');
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error("Error fetching current user", error);
+      }
+    };
+  
     fetchComments();
-
+    fetchCurrentUser();
+  
     socket.emit('joinReport', reportId);
-
+  
     socket.on('newComment', (comment) => {
       setComments((prevComments) => [...prevComments, comment]);
     });
-
+  
     socket.on('updateComment', (updatedComment) => {
-      setComments((prevComments) => 
-        prevComments.map((comment) => comment._id === updatedComment._id ? updatedComment : comment)
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment._id === updatedComment._id ? updatedComment : comment
+        )
       );
     });
-
+  
     socket.on('deleteComment', (commentId) => {
-      setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
+      setComments((prevComments) =>
+        prevComments.filter((comment) => comment._id !== commentId)
+      );
     });
-
+  
     return () => {
       socket.emit('leaveReport', reportId);
       socket.disconnect();
     };
-  }, [reportId, socket]); // Agregar socket como dependencia
+  }, [reportId, socket]);  // Agregar socket como dependencia
 
   const handleAddComment = async () => {
     try {
@@ -78,55 +94,63 @@ const CommentSection = ({ reportId }) => {
   return (
     <div className="mt-4">
       <h2 className="text-xl font-bold mb-4">Comments</h2>
-      <div className="mb-4 h-64 overflow-y-auto">
-        {comments.map((comment) => (
-          <div key={comment._id} className="bg-gray-100 p-2 rounded-md mb-2">
-            <p className="text-gray-700 font-bold">{comment.createdBy.username}</p>
-            <p className="text-gray-500 text-sm">
-              {moment(comment.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
-            </p>
-            <p className="text-gray-700">{comment.text}</p>
-            {editingCommentId === comment._id ? (
-              <div className="mt-2">
-                <textarea
-                  value={editingText}
-                  onChange={(e) => setEditingText(e.target.value)}
-                  className="w-full p-2 rounded-md border border-gray-300"
-                />
-                <button
-                  onClick={() => handleEditComment(comment._id)}
-                  className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors mt-2 mr-2"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => setEditingCommentId(null)}
-                  className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition-colors mt-2"
-                >
-                  Cancel
-                </button>
-              </div>
-            ) : (
-              <div className="mt-2 flex space-x-2">
-                <button
-                  onClick={() => {
-                    setEditingCommentId(comment._id);
-                    setEditingText(comment.text);
-                  }}
-                  className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-yellow-600 transition-colors"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDeleteComment(comment._id)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            )}
+      <div className="mb-3 h-40 overflow-y-auto">
+        {comments.length === 0 ? (
+          <div className="bg-gray-200 p-3 rounded-md text-center text-gray-600">
+            Sé el primero en comentar sobre esta incidencia.
           </div>
-        ))}
+        ) : (
+          comments.map((comment) => (
+            <div key={comment._id} className="bg-gray-100 p-2 rounded-md mb-2">
+              <p className="text-gray-700 font-bold text-sm">{comment.createdBy.username}</p>
+              <p className="text-gray-500 text-xs">
+                {moment(comment.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
+              </p>
+              <p className="text-gray-700 text-sm">{comment.text}</p>
+              {currentUser && currentUser._id === comment.createdBy._id && (
+                editingCommentId === comment._id ? (
+                  <div className="mt-2">
+                    <textarea
+                      value={editingText}
+                      onChange={(e) => setEditingText(e.target.value)}
+                      className="w-full p-2 rounded-md border border-gray-300"
+                    />
+                    <button
+                      onClick={() => handleEditComment(comment._id)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors mt-2 mr-2"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingCommentId(null)}
+                      className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600 transition-colors mt-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingCommentId(comment._id);
+                        setEditingText(comment.text);
+                      }}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteComment(comment._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )
+              )}
+            </div>
+          ))
+        )}
       </div>
       <textarea
         value={newComment}

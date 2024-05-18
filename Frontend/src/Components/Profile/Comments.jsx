@@ -10,6 +10,7 @@ const Comments = ({ reportId }) => {
   const [newComment, setNewComment] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingText, setEditingText] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -21,7 +22,17 @@ const Comments = ({ reportId }) => {
       }
     };
 
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/user/me'); 
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error("Error fetching current user", error);
+      }
+    };
+
     fetchComments();
+    fetchCurrentUser();
 
     socket.emit('joinReport', reportId);
 
@@ -92,44 +103,46 @@ const Comments = ({ reportId }) => {
                 {moment(comment.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
               </p>
               <p className="text-gray-700 text-sm">{comment.text}</p>
-              {editingCommentId === comment._id ? (
-                <div className="mt-2">
-                  <textarea
-                    value={editingText}
-                    onChange={(e) => setEditingText(e.target.value)}
-                    className="w-full p-2 rounded-md border border-gray-300"
-                  />
-                  <button
-                    onClick={() => handleEditComment(comment._id)}
-                    className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors mt-2 mr-2"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => setEditingCommentId(null)}
-                    className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600 transition-colors mt-2"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              ) : (
-                <div className="mt-2 flex space-x-2">
-                  <button
-                    onClick={() => {
-                      setEditingCommentId(comment._id);
-                      setEditingText(comment.text);
-                    }}
-                    className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDeleteComment(comment._id)}
-                    className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
-                  >
-                    Delete
-                  </button>
-                </div>
+              {currentUser && currentUser._id === comment.createdBy._id && (
+                editingCommentId === comment._id ? (
+                  <div className="mt-2">
+                    <textarea
+                      value={editingText}
+                      onChange={(e) => setEditingText(e.target.value)}
+                      className="w-full p-2 rounded-md border border-gray-300"
+                    />
+                    <button
+                      onClick={() => handleEditComment(comment._id)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded-md hover:bg-blue-600 transition-colors mt-2 mr-2"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingCommentId(null)}
+                      className="bg-gray-500 text-white px-3 py-1 rounded-md hover:bg-gray-600 transition-colors mt-2"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="mt-2 flex space-x-2">
+                    <button
+                      onClick={() => {
+                        setEditingCommentId(comment._id);
+                        setEditingText(comment.text);
+                      }}
+                      className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDeleteComment(comment._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )
               )}
             </div>
           ))
