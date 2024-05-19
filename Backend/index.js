@@ -266,6 +266,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 const baseUrl = process.env.BASE_URL;
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // app.get("/report", async (req, res) => {
 //   try {
@@ -549,6 +551,63 @@ app.post("/report", upload.single("image"), async (req, res) => {
     res.status(500).json({ error: "Error creating report" });
   }
 });
+
+// app.post("/report", upload.single("image"), async (req, res) => {
+//   try {
+//     const { title, description, state, incidentDate } = req.body;
+
+//     let imagePath = null;
+//     if (req.file) {
+//       imagePath = req.file.path;
+//     }
+
+//     const token = req.cookies?.token;
+//     if (!token) {
+//       return res.status(401).json({ error: "User not authenticated" });
+//     }
+
+//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+//     const userId = decodedToken.userId;
+
+//     const newReport = await Report.create({
+//       title,
+//       description,
+//       state,
+//       image: imagePath,
+//       incidentDate,
+//       createdBy: userId,
+//       createdAt: new Date(),
+//     });
+
+//     const reportWithDetails = {
+//       ...newReport.toObject(),
+//       createdBy: (await User.findById(userId)).username,
+//       image: imagePath ? `${baseUrl}${imagePath}` : null,
+//     };
+
+//     io.emit("new-report", reportWithDetails);
+
+//     // Enviar notificación por correo electrónico al administrador
+//     const adminEmail = process.env.ADMIN_EMAIL;
+//     await sendEmail(
+//       adminEmail,
+//       'Nuevo reporte creado',
+//       `Se ha creado un nuevo reporte con el título: ${title}`,
+//       `<p>Se ha creado un nuevo reporte con el título: <strong>${title}</strong></p>
+//        <p>Descripción: ${description}</p>
+//        <p>Fecha del incidente: ${incidentDate}</p>`
+//     );
+
+//     res.status(201).json(reportWithDetails);
+//   } catch (error) {
+//     console.error(error);
+//     if (req.file) {
+//       fs.unlinkSync(req.file.path);
+//     }
+//     res.status(500).json({ error: "Error creating report" });
+//   }
+// });
+
 
 app.delete("/report/:id", async (req, res) => {
   try {
@@ -1042,61 +1101,11 @@ app.put("/user", uploads.single("profileImage"), async (req, res) => {
   }
 });
 
-// Mensaje reciente //
 
-app.get("/recent-messages", authenticateJWT, async (req, res) => {
-  try {
-    const userId = req.user.userId; // Ahora puedes acceder a req.user
-    const recentMessages = await Message.find({ recipient: userId })
-      .sort({ createdAt: -1 })
-      .limit(5);
-    res.json(recentMessages);
-  } catch (error) {
-    console.error("Error fetching recent messages:", error);
-    res.status(500).json({ error: "Error fetching recent messages" });
-  }
-});
 
-async function authenticateJWT(req, res, next) {
-  try {
-    const token = req.cookies?.token;
-    if (token) {
-      const decodedToken = jwt.verify(token, jwtSecret);
-      req.user = decodedToken;
-      next();
-    } else {
-      throw new Error("Token not provided");
-    }
-  } catch (error) {
-    console.error("Authentication error:", error);
-    res.status(401).json({ error: "Authentication failed" });
-  }
-}
 
-// Importa la biblioteca 'resend'
-const { Resend } = require("resend");
 
-// // Configura la clave de la API de Resend
-// const resend = new Resend('re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1');
 
-// // Define las opciones del correo electrónico
-// const emailOptions = {
-//   from: 'onboarding@resend.dev',
-//   to: 'raysellconcepcionpaulino@gmail.com',
-//   subject: 'Hello World',
-//   html: '<p>Hola, has solicitado restablecer tu contraseña. Sigue este enlace para restablecerla: <a href="http://example.com/reset-password">Restablecer Contraseña</a></p>'
-// };
-
-// // Envía el correo electrónico
-// resend.emails.send(emailOptions)
-//   .then(response => {
-//     console.log('Email sent successfully:', response);
-//   })
-//   .catch(error => {
-//     console.error('Error sending email:', error);
-//   });
-
-const resend = new Resend("re_CMBEPYs3_22anAeaHCH9eS8HmZhaNjMg1");
 
 // Define la ruta para enviar el correo de recuperación de contraseña
 app.post("/api/sendPasswordRecoveryEmail", async (req, res) => {
@@ -1151,3 +1160,34 @@ app.get("/user/me", authenticateUser, async (req, res) => {
     res.status(500).json({ error: "Error fetching current user data" });
   }
 });
+
+// Mensaje reciente //
+
+app.get("/recent-messages", authenticateJWT, async (req, res) => {
+  try {
+    const userId = req.user.userId; // Ahora puedes acceder a req.user
+    const recentMessages = await Message.find({ recipient: userId })
+      .sort({ createdAt: -1 })
+      .limit(5);
+    res.json(recentMessages);
+  } catch (error) {
+    console.error("Error fetching recent messages:", error);
+    res.status(500).json({ error: "Error fetching recent messages" });
+  }
+});
+
+async function authenticateJWT(req, res, next) {
+  try {
+    const token = req.cookies?.token;
+    if (token) {
+      const decodedToken = jwt.verify(token, jwtSecret);
+      req.user = decodedToken;
+      next();
+    } else {
+      throw new Error("Token not provided");
+    }
+  } catch (error) {
+    console.error("Authentication error:", error);
+    res.status(401).json({ error: "Authentication failed" });
+  }
+}
