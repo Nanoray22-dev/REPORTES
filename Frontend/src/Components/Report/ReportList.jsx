@@ -1,8 +1,6 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import logo from "/logo.png";
-import { useContext } from "react";
 import { UserContext } from "../../UserContext";
-
 
 const ReportList = ({
   report,
@@ -13,6 +11,7 @@ const ReportList = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const { role } = useContext(UserContext);
+
   const handleStateChangeAndCloseModal = async (e, reportId) => {
     await handleStateChange(e, reportId);
     handleCloseModal();
@@ -22,6 +21,7 @@ const ReportList = ({
     await handleDelete(reportId);
     handleCloseModal();
   };
+
   const openModal = (image) => {
     setSelectedImage(image);
     setModalOpen(true);
@@ -36,51 +36,35 @@ const ReportList = ({
     : [report.image];
 
   return (
-    <div key={report._id} className="bg-white rounded-lg shadow-lg p-8 mb-4">
+    <div key={report._id} className="bg-white rounded-lg shadow-lg p-6 mb-4">
       <div className="flex items-center mb-4">
-        <img src={logo} alt="Logo" className="h-24 w-24 mr-4 rounded-full" />
+        <img src={logo} alt="Logo" className="h-16 w-16 mr-4 rounded-full" />
         <div>
-          <h3 className="text-lg font-semibold">{report.title}</h3>
-          <p className="text-sm text-gray-500">
-            Reporte hecho por: {report.createdBy}
-          </p>
-          <p className="text-sm text-gray-500">
-            Fecha: {new Date(report.createdAt).toLocaleDateString()}
-          </p>
+          <h3 className="text-lg font-semibold text-gray-800">{report.title}</h3>
+          <p className="text-sm text-gray-500">Reporte hecho por: {report.createdBy}</p>
+          <p className="text-sm text-gray-500">Fecha: {new Date(report.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
-      <div className="overflow-auto max-h-48">
+      <div className="overflow-auto max-h-48 mb-4">
         <p className="text-gray-600 mb-4 max-w-[400px]">{report.description}</p>
       </div>
-
       {imagesArray && imagesArray.length > 0 && (
         <div className="mt-4">
           <div className="flex flex-wrap -mx-2">
             {imagesArray.map((image, index) => (
-              <div key={index} className="w-full  p-2">
+              <div key={index} className="w-1/2 sm:w-1/3 p-2">
                 <img
                   src={image}
                   alt={`Report Image ${index + 1}`}
-                  className="h-24 w-full object-cover rounded-lg cursor-pointer"
+                  className="h-24 w-full object-cover rounded-lg cursor-pointer hover:opacity-75 transition-opacity"
                   onClick={() => openModal(image)}
                 />
               </div>
             ))}
-            <div className="w-full p-2 text-center">
-              <p
-                className="text-blue-500 hover:underline cursor-pointer"
-                onClick={() => {
-                  /*  implementar la lógica para ver más imágenes */
-                }}
-              >
-                Ver más fotos ({imagesArray.length})
-              </p>
-            </div>
           </div>
         </div>
       )}
-
-      {modalOpen && (
+     {modalOpen && (
         <div className="fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-50 flex items-center justify-center">
           <div className="relative max-w-full max-h-full">
             <button
@@ -98,31 +82,29 @@ const ReportList = ({
           </div>
         </div>
       )}
-
-      <div className="flex mt-6">
-        {role === "admin" ? (
+      <div className="flex mt-6 items-center">
+        {role === "admin" && (
           <select
             value={report.state}
             onChange={(e) => handleStateChangeAndCloseModal(e, report._id)}
-            className="flex-1 p-2 mr-4 border rounded-md bg-gray-100"
+            className="flex-1 p-2 mr-4 border rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           >
             <option value="PENDING">Pendiente</option>
             <option value="IN_PROGRESS">En Progreso</option>
             <option value="COMPLETED">Completado</option>
-            <option value="CLOSED">Tardia</option>
+            <option value="CLOSED">Cerrado</option>
             <option value="REJECTED">Rechazado</option>
           </select>
-        ) : null}
-
+        )}
         <button
           onClick={() => handleDeleteAndCloseModal(report._id)}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2"
+          className="bg-red-500 text-white px-4 py-2 rounded-lg mr-2 hover:bg-red-600 transition-colors"
         >
           Borrar
         </button>
         <button
           onClick={handleCloseModal}
-          className="bg-red-500 text-white px-4 py-2 rounded-lg"
+          className="bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
         >
           Cerrar
         </button>

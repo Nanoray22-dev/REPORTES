@@ -10,7 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
     "@mantine/core": "^7.9.1",
     "@mantine/hooks": "^7.9.1",
     "@material-ui/core": "^4.12.4",
@@ -24,6 +26,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^3.6.0",
     "file-saver": "^2.0.5",
+    "framer-motion": "^11.2.4",
     "gsap": "^3.12.5",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",

@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
 import io from 'socket.io-client';
-
+import { FaRegEdit } from "react-icons/fa";
+import { RiDeleteBin6Line } from "react-icons/ri";
 const socket = io();
 
 const Comments = ({ reportId }) => {
@@ -131,15 +132,15 @@ const Comments = ({ reportId }) => {
                         setEditingCommentId(comment._id);
                         setEditingText(comment.text);
                       }}
-                      className="bg-yellow-500 text-white px-3 py-1 rounded-md hover:bg-yellow-600 transition-colors"
+                      className="text-yellow-500  px-3 py-1 rounded-md hover:bg-yellow-300 transition-colors "
                     >
-                      Edit
+                     <FaRegEdit /> 
                     </button>
                     <button
                       onClick={() => handleDeleteComment(comment._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded-md hover:bg-red-600 transition-colors"
+                      className="text-red-500  px-3 py-1 rounded-md hover:bg-red-300 transition-colors"
                     >
-                      Delete
+                     <RiDeleteBin6Line />
                     </button>
                   </div>
                 )

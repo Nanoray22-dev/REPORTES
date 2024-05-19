@@ -1,6 +1,5 @@
-// Navigation.jsx
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { TiHomeOutline } from "react-icons/ti";
@@ -11,18 +10,29 @@ import { MdOutlineContactSupport } from "react-icons/md";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import { MdOutlineContactMail } from "react-icons/md";
 import { TreeNode } from "./TreeNode";
+
 const Navigation = () => {
   const history = useNavigate();
   const { setId, setUsername } = useContext(UserContext);
   const [, setWs] = useState(null);
   const [isOpen, setIsOpen] = useState(false);
+
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
-  const handleMouseLeave = () => {
-    setIsOpen(false);
+  const handleClickOutside = (event) => {
+    if (isOpen && !event.target.closest('.settings-menu')) {
+      setIsOpen(false);
+    }
   };
+
+  useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  }, [isOpen]);
 
   function logout() {
     axios.post("/logout").then(() => {
@@ -31,11 +41,11 @@ const Navigation = () => {
       setUsername(null);
       history("/");
     });
-
   }
+
   return (
     <>
-      <nav className="bg-white w-full p-4 shadow-md ">
+      <nav className="bg-white w-full p-4 shadow-md">
         <div className="flex justify-between items-center">
           <div className="text-xl font-bold text-gray-500">
             Fix<span className="text-orange-400">Oasis</span>{" "}
@@ -62,25 +72,24 @@ const Navigation = () => {
             </li>
             <li className="flex gap-1">
               <MdOutlineContactSupport className="mt-1" />
-              <Link className="hover:text-black" to="/assign">
-                {" "}
-                Contacto
+              <Link className="hover:text-black" to="/comment">
+                SocialReport
               </Link>
             </li>
 
-            <div className="">
+            <div className="relative">
               <button
                 onClick={toggleMenu}
-                className="flex items-center gap-1 text-black  px-2 rounded-xl hover:bg-primary-900/50 transition-colors"
+                className="flex items-center gap-1 text-black px-2 rounded-xl hover:bg-primary-900/50 transition-colors"
               >
                 <TbSettingsPlus /> Settings
               </button>
               {isOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1"
-                  onMouseLeave={handleMouseLeave}
+                  className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 settings-menu"
+                  style={{ zIndex: 50 }} // Aquí se agrega el z-index
+                  onMouseLeave={() => setIsOpen(false)}
                 >
-                  {" "}
                   <TreeNode
                     className="hover:text-black no-underline"
                     icon={<MdOutlineContactMail />}
@@ -103,7 +112,6 @@ const Navigation = () => {
         </div>
         <Outlet />
       </nav>
-      
     </>
   );
 };
