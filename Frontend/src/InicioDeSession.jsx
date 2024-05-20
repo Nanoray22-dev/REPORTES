@@ -4,57 +4,81 @@ import { UserContext } from "./UserContext.jsx";
 import logo from "/logo.png";
 import PreLoader from "./Components/Helpers/PreLoader.jsx";
 import { useNavigate } from "react-router-dom";
-
+import Swal from 'sweetalert2';
 
 export default function RegisterAndLoginForm() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [notification, setNotification] = useState(null);
   const [isLoginOrRegister, setIsLoginOrRegister] = useState("login");
-  const { setUsername: setLoggedInUsername, setId, role, setRole } = useContext(UserContext);
-  const [isLoading, setIsLoading] = useState(false); // Estado para controlar la carga
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Estado para controlar si el usuario está autenticado o no
-  const navigate = useNavigate()
+  const { setUsername: setLoggedInUsername, setId, setRole } = useContext(UserContext);
+  const [isLoading, setIsLoading] = useState(false);
+  const [usernameError, setUsernameError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
+  const navigate = useNavigate();
 
   async function handleSubmit(ev) {
     ev.preventDefault();
-    setIsLoading(true); // Activar el preloader al enviar la solicitud
+    setIsLoading(true);
     const url = isLoginOrRegister === "register" ? "register" : "login";
     try {
       const { data } = await axios.post(url, { username, password });
       setLoggedInUsername(username);
       setId(data.id);
       setRole(data.role);
-      console.log(data.role)
-      setIsLoggedIn(true); 
-      setIsLoading(false); 
+      setIsLoading(false);
 
-      if(data.role === 'admin') {
-        console.log(data.role)
-        navigate('/dashboard')
-      }else{
-        navigate('/profile')
-      }
-
-    } catch (error) {
-      setIsLoading(false); 
-      if (error.response.status === 404) {
-        setNotification("Usuario no encontrado. Intente con otro usuario.");
-      } else if (error.response.status === 401) {
-        setNotification(
-          "Credenciales incorrectas. Verifique su nombre de usuario y contraseña."
-        );
+      if (data.role === 'admin') {
+        navigate('/dashboard');
       } else {
-        setNotification(
-          "Se produjo un error al procesar su solicitud. Inténtelo de nuevo más tarde."
-        );
+        navigate('/profile');
+      }
+    } catch (error) {
+      setIsLoading(false);
+      setUsernameError(false);
+      setPasswordError(false);
+
+      if (error.response) {
+        if (error.response.status === 404) {
+          setUsernameError(true);
+          Swal.fire({
+            position: "top-end",
+            icon: 'error',
+            title: 'Usuario no encontrado',
+            text: 'Intente con otro usuario.',
+            showConfirmButton: false,
+          });
+        } else if (error.response.status === 401) {
+          setUsernameError(true);
+          setPasswordError(true);
+          Swal.fire({
+            position: "top-end",
+            icon: 'error',
+            title: 'Credenciales incorrectas',
+            text: 'Verifique su nombre de usuario y contraseña.',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            position: "top-end",
+            icon: 'error',
+            title: 'Error',
+            text: 'User not exits.',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'No se pudo conectar con el servidor. Inténtelo de nuevo más tarde.',
+          showConfirmButton: false,
+          timer: 1500
+        });
       }
     }
-  }
-
-  if (isLoggedIn) {
-    // Si el usuario está autenticado, redirigir a otra página o mostrar el contenido correspondiente
-   return <div>Bienvenido</div>
   }
 
   return (
@@ -70,15 +94,19 @@ export default function RegisterAndLoginForm() {
                 "url(https://images.unsplash.com/photo-1616763355603-9755a640a287?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80)",
             }}
           >
-            <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-40">
+              <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-60">
               <div>
-                <h2 className="text-5xl font-bold text-gray-400">
+                <h2 className="text-6xl font-extrabold text-white">
                   Fix<span className="text-orange-400">Oais</span>
                 </h2>
-                <p className="max-w-xl mt-3 text-gray-300">
-                  Lorem ipsum dolor sit, amet consectetur adipisicing elit. In
-                  autem ipsa, nulla laboriosam dolores, repellendus perferendis
-                  libero suscipit nam temporibus molestiae
+                <p className="text-white ml-3 font-medium text-xm">
+                Turn your voice into action! 
+                </p>
+                <p className="max-w-xl mt-5 text-xl text-white font-medium leading-relaxed">
+                  FixOasis gives you the opportunity to improve your environment with just a few clicks. 
+                  Log in now to report issues, collaborate with other residents, 
+                  and make Residencial Oasis an even better place to live. 
+                  Your participation makes a difference!
                 </p>
               </div>
             </div>
@@ -104,7 +132,7 @@ export default function RegisterAndLoginForm() {
                 <form onSubmit={handleSubmit}>
                   <div>
                     <label
-                      htmlFor="text"
+                      htmlFor="username"
                       className="block mb-2 text-sm text-gray-600 dark:text-gray-200"
                     >
                       Username
@@ -113,8 +141,11 @@ export default function RegisterAndLoginForm() {
                       value={username}
                       onChange={(ev) => setUsername(ev.target.value)}
                       type="text"
+                      id="username"
                       placeholder="example Ramon"
-                      className="block w-full px-4 py-2 mt-2 text-black placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-900 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`block w-full px-4 py-2 mt-2 text-black placeholder-gray-400 bg-white border rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-900 focus:outline-none focus:ring focus:ring-opacity-40 ${
+                        usernameError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400'
+                      }`}
                     />
                   </div>
                   <div className="mt-6">
@@ -136,8 +167,11 @@ export default function RegisterAndLoginForm() {
                       value={password}
                       onChange={(ev) => setPassword(ev.target.value)}
                       type="password"
+                      id="password"
                       placeholder="Put your Password"
-                      className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-900 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40"
+                      className={`block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-900 focus:outline-none focus:ring focus:ring-opacity-40 form-control${
+                        passwordError ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-200 dark:border-gray-700 focus:border-green-400 dark:focus:border-green-400 focus:ring-green-400 form-control'
+                      }`}
                     />
                   </div>
                   <p className="mt-3 text-gray-500 dark:text-gray-300">

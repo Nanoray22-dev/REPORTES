@@ -40,6 +40,7 @@ app.use(
     origin: process.env.CLIENT_URL,
   })
 );
+
 const server = app.listen(4040);
 const io = socketIo(server);
 // WebSockets
@@ -116,13 +117,21 @@ app.post("/login", async (req, res) => {
         jwtSecret,
         {},
         (err, token) => {
-          res.cookie("token", token, { sameSite: "none", secure: true }).json({
-            id: foundUser._id,
-            role: foundUser.role,
-          });
+          if (err) {
+            res.status(500).json({ message: "Error en la generación del token" });
+          } else {
+            res.cookie("token", token, { sameSite: "none", secure: true }).json({
+              id: foundUser._id,
+              role: foundUser.role,
+            });
+          }
         }
       );
+    } else {
+      res.status(401).json({ message: "Credenciales incorrectas" });
     }
+  } else {
+    res.status(404).json({ message: "Usuario no encontrado" });
   }
 });
 
@@ -139,18 +148,20 @@ app.post("/register", async (req, res) => {
       jwtSecret,
       {},
       (err, token) => {
-        if (err) throw err;
-        res
-          .cookie("token", token, { sameSite: "none", secure: true })
-          .status(201)
-          .json({
-            id: createdUser._id,
-          });
+        if (err) {
+          res.status(500).json({ message: "Error en la generación del token" });
+        } else {
+          res
+            .cookie("token", token, { sameSite: "none", secure: true })
+            .status(201)
+            .json({
+              id: createdUser._id,
+            });
+        }
       }
     );
   } catch (err) {
-    if (err) throw err;
-    res.status(500).json("error");
+    res.status(500).json({ message: "Error al registrar el usuario" });
   }
 });
 
@@ -269,162 +280,8 @@ const baseUrl = process.env.BASE_URL;
 const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-// app.get("/report", async (req, res) => {
-//   try {
-//     // Obtén el usuario desde el token de autenticación
-//     const token = req.cookies?.token;
-//     if (!token) {
-//       return res.status(401).json({ error: "User not authenticated" });
-//     }
-//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-//     const userId = decodedToken.userId;
 
-//     // Verifica el rol del usuario
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
 
-//     // Si el usuario es administrador, devuelve todos los reportes
-//     if (user.role === "admin") {
-//       const reports = await Report.find().populate("createdBy", "username");
-//       const reportsWithUsername = reports.map((report) => ({
-//         ...report.toObject(),
-//         createdBy: report.createdBy.username,
-//         image: report.image ? `${baseUrl}${report.image}` : null,
-//       }));
-//       return res.json(reportsWithUsername);
-//     } else {
-//       // Si el usuario no es administrador, devuelve solo los reportes creados por ese usuario
-//       const reports = await Report.find({ createdBy: userId }).populate(
-//         "createdBy",
-//         "username"
-//       );
-//       const reportsWithUsername = reports.map((report) => ({
-//         ...report.toObject(),
-//         createdBy: report.createdBy.username,
-//         image: report.image ? `${baseUrl}${report.image}` : null,
-//       }));
-//       return res.json(reportsWithUsername);
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ error: "Error fetching reports" });
-//   }
-// });
-
-// app.post("/report", upload.single("image"), async (req, res) => {
-//   try {
-//     const { title, description, state, incidentDate } = req.body;
-
-//     let imagePath = null;
-//     if (req.file) {
-//       imagePath = req.file.path;
-//     }
-
-//     // Obtener el usuario desde el token de autenticación
-//     const token = req.cookies?.token;
-//     if (!token) {
-//       return res.status(401).json({ error: "User not authenticated" });
-//     }
-//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-//     const userId = decodedToken.userId;
-
-//     // Crear el reporte con el usuario y la fecha de creación
-//     const newReport = await Report.create({
-//       title,
-//       description,
-//       state,
-//       image: imagePath,
-//       incidentDate,
-//       createdBy: userId, // Establecer el usuario como creador del reporte
-//       createdAt: new Date(), // Establecer la fecha de creación del reporte
-//     });
-
-//     // Enviar la respuesta solo una vez al final del bloque try
-//     res.status(201).json(newReport);
-//   } catch (error) {
-//     console.error(error);
-//     // Si ocurrió un error, eliminar la imagen subida (si existe)
-//     if (req.file) {
-//       fs.unlinkSync(req.file.path);
-//     }
-//     res.status(500).json({ error: "Error creating report" });
-//   }
-// });
-
-// app.post("/report", upload.array("image"), async (req, res) => {
-//   try {
-//     const { title, description, state, incidentDate } = req.body;
-
-//     let imagePath = null;
-//     if (req.file) {
-//       imagePath = req.file.path;
-//     }
-
-//     // Obtener el usuario desde el token de autenticación
-//     const token = req.cookies?.token;
-//     if (!token) {
-//       return res.status(401).json({ error: "User not authenticated" });
-//     }
-//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-//     const userId = decodedToken.userId;
-
-//     // Crear el reporte con el usuario y la fecha de creación
-//     const newReport = await Report.create({
-//       title,
-//       description,
-//       state,
-//       image: imagePath,
-//       incidentDate,
-//       createdBy: userId, // Establecer el usuario como creador del reporte
-//       createdAt: new Date(), // Establecer la fecha de creación del reporte
-//     });
-
-//     // Enviar la respuesta solo una vez al final del bloque try
-//     res.status(201).json(newReport);
-//   } catch (error) {
-//     console.error(error);
-//     // Si ocurrió un error, eliminar la imagen subida (si existe)
-//     if (req.file) {
-//       fs.unlinkSync(req.file.path);
-//     }
-//     res.status(500).json({ error: "Error creating report" });
-//   }
-// });
-// app.get("/report", async (req, res) => {
-//   try {
-//     const token = req.cookies?.token;
-//     if (!token) {
-//       return res.status(401).json({ error: "User not authenticated" });
-//     }
-//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-//     const userId = decodedToken.userId;
-
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     let reports;
-//     if (user.role === "admin") {
-//       reports = await Report.find().populate("createdBy", "username");
-//     } else {
-//       reports = await Report.find({ createdBy: userId }).populate("createdBy", "username");
-//     }
-
-//     const reportsWithUsername = reports.map((report) => ({
-//       ...report.toObject(),
-//       createdBy: report.createdBy.username,
-//       images: report.images ? report.images.map(image => `${baseUrl}${image}`) : [],
-//     }));
-
-//     return res.json(reportsWithUsername);
-//   } catch (error) {
-//     console.error(error);
-//     return res.status(500).json({ error: "Error fetching reports" });
-//   }
-// });
 app.get("/report", async (req, res) => {
   try {
     const token = req.cookies?.token;
@@ -551,63 +408,6 @@ app.post("/report", upload.single("image"), async (req, res) => {
     res.status(500).json({ error: "Error creating report" });
   }
 });
-
-// app.post("/report", upload.single("image"), async (req, res) => {
-//   try {
-//     const { title, description, state, incidentDate } = req.body;
-
-//     let imagePath = null;
-//     if (req.file) {
-//       imagePath = req.file.path;
-//     }
-
-//     const token = req.cookies?.token;
-//     if (!token) {
-//       return res.status(401).json({ error: "User not authenticated" });
-//     }
-
-//     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-//     const userId = decodedToken.userId;
-
-//     const newReport = await Report.create({
-//       title,
-//       description,
-//       state,
-//       image: imagePath,
-//       incidentDate,
-//       createdBy: userId,
-//       createdAt: new Date(),
-//     });
-
-//     const reportWithDetails = {
-//       ...newReport.toObject(),
-//       createdBy: (await User.findById(userId)).username,
-//       image: imagePath ? `${baseUrl}${imagePath}` : null,
-//     };
-
-//     io.emit("new-report", reportWithDetails);
-
-//     // Enviar notificación por correo electrónico al administrador
-//     const adminEmail = process.env.ADMIN_EMAIL;
-//     await sendEmail(
-//       adminEmail,
-//       'Nuevo reporte creado',
-//       `Se ha creado un nuevo reporte con el título: ${title}`,
-//       `<p>Se ha creado un nuevo reporte con el título: <strong>${title}</strong></p>
-//        <p>Descripción: ${description}</p>
-//        <p>Fecha del incidente: ${incidentDate}</p>`
-//     );
-
-//     res.status(201).json(reportWithDetails);
-//   } catch (error) {
-//     console.error(error);
-//     if (req.file) {
-//       fs.unlinkSync(req.file.path);
-//     }
-//     res.status(500).json({ error: "Error creating report" });
-//   }
-// });
-
 
 app.delete("/report/:id", async (req, res) => {
   try {
