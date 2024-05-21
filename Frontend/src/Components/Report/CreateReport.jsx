@@ -33,7 +33,7 @@ const CreateReport = ({ onSubmit, onCloseModal }) => {
         text: "El reporte se ha creado con éxito",
         icon: "success",
         showConfirmButton: false,
-        timer: 1000,
+        timer: 1500,
       });
 
 
@@ -55,12 +55,7 @@ const CreateReport = ({ onSubmit, onCloseModal }) => {
     setImage(file);
   };
   
-
-  // const handleImageRemove = (index) => {
-  //   const newImages = [...image];
-  //   newImages.splice(index, 1);
-  //   setImage(newImages);
-  // };
+  
 
   return (
     <div className="fixed inset-0 z-10 flex items-center justify-center overflow-x-auto overflow-y-auto bg-black bg-opacity-50">

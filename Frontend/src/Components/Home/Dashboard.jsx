@@ -1,8 +1,7 @@
 import axios from "axios";
-import { useContext } from "react";
+import { useContext,useState,useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
-import { useState } from "react";
 import { RiLogoutBoxRLine } from "react-icons/ri";
 import {
   MdOutlineContactMail,
@@ -10,7 +9,6 @@ import {
   MdOutlinePayments,
 } from "react-icons/md";
 import { CgDarkMode } from "react-icons/cg";
-import { useEffect } from "react";
 import { Bar, Line } from "react-chartjs-2";
 import "chart.js/auto";
 import moment from "moment";
@@ -97,10 +95,19 @@ function Dashboard({ username }) {
     }
   };
 
+
+  // const addNewReport = (newReport) => {
+  //   // Function to add a new report and maintain the LIFO order
+  //   setReports(prevReports => {
+  //     const updatedReports = [newReport, ...prevReports];
+  //     return updatedReports.slice(-10);
+  //   });
+  // };
+
   const updateReports = (newReports) => {
     setReports((prevReports) => {
       const updatedReports = [...newReports, ...prevReports];
-      return updatedReports.slice(0, 10);
+      return updatedReports.slice(-8);
     });
   };
 
