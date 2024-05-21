@@ -87,7 +87,7 @@ const Navigation = () => {
               {isOpen && (
                 <div
                   className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 settings-menu"
-                  style={{ zIndex: 50 }} // Aquí se agrega el z-index
+                  style={{ zIndex: 50 }} 
                   onMouseLeave={() => setIsOpen(false)}
                 >
                   <TreeNode
