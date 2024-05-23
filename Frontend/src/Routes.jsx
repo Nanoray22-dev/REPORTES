@@ -28,20 +28,13 @@ export default function Rutas() {
       <Route path="/chat" element={<Chat />} />
       <Route path="/assign" element={<AssignReport  />} />
       <Route path="/comment" element={<SocialReports  />} />
-
       <Route path="/access-denied" element={<AccessDeniedPage />} />
-
-      {/* <Route path="*" element={<Navigate to="/access-denied" />} /> */}
     </Routes>
     );
   }
 
   return (
     <>
-      {/* <Routes>
-      <Route path="/login" element={<InicioDeSession />} />
-       
-    </Routes> */}
       <InicioDeSession />
     </>
   );

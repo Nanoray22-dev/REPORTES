@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext,useState,useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 import { RiLogoutBoxRLine } from "react-icons/ri";
@@ -12,6 +12,8 @@ import { CgDarkMode } from "react-icons/cg";
 import { Bar, Line } from "react-chartjs-2";
 import "chart.js/auto";
 import moment from "moment";
+import Sidebar from "./Sidebar";
+import Header from "./Header";
 
 function Dashboard({ username }) {
   const history = useNavigate();
@@ -27,27 +29,61 @@ function Dashboard({ username }) {
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [usersByMonth, setUsersByMonth] = useState({});
   const [reportsByMonth, setReportsByMonth] = useState({});
+  const [usersByDay, setUsersByDay] = useState({});
+  const [usersByWeek, setUsersByWeek] = useState({});
+  const [reportsByDay, setReportsByDay] = useState({});
+  const [reportsByWeek, setReportsByWeek] = useState({});
+  const [filter, setFilter] = useState("month");
 
   const getRandomProfileImage = () => {
     const randomId = Math.floor(Math.random() * 100) + 1;
     return `https://randomuser.me/api/portraits/thumb/men/${randomId}.jpg`;
   };
 
+  const getFilteredData = (dataByDay, dataByWeek, dataByMonth) => {
+    switch (filter) {
+      case "day":
+        return dataByDay;
+      case "week":
+        return dataByWeek;
+      case "month":
+      default:
+        return dataByMonth;
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get("/users");
-      setTotalUsersCount(response.data.length);
       const usersData = response.data;
-      const recentUsers = response.data.slice(0, 10);
+      setTotalUsersCount(usersData.length);
+
+      const usersByDayData = usersData.reduce((acc, user) => {
+        const day = moment(user.createdAt).format("YYYY-MM-DD");
+        if (!acc[day]) acc[day] = 0;
+        acc[day]++;
+        return acc;
+      }, {});
+
+      const usersByWeekData = usersData.reduce((acc, user) => {
+        const week = moment(user.createdAt).format("YYYY-[W]WW");
+        if (!acc[week]) acc[week] = 0;
+        acc[week]++;
+        return acc;
+      }, {});
+
       const usersByMonthData = usersData.reduce((acc, user) => {
-        const month = moment(user.registrationDate).format("MMM YYYY");
-        if (!acc[month]) {
-          acc[month] = 0;
-        }
+        const month = moment(user.createdAt).format("YYYY-MM");
+        if (!acc[month]) acc[month] = 0;
         acc[month]++;
         return acc;
       }, {});
+
+      setUsersByDay(usersByDayData);
+      setUsersByWeek(usersByWeekData);
       setUsersByMonth(usersByMonthData);
+
+      const recentUsers = usersData.slice(0, 10);
       const usersWithImages = recentUsers.map((user) => ({
         ...user,
         profileImage: getRandomProfileImage(),
@@ -80,21 +116,34 @@ function Dashboard({ username }) {
       setCompletedReportsCount(completedReportsCount);
       setTotalReportsCount(reportsData.length);
 
+      const reportsByDayData = reportsData.reduce((acc, report) => {
+        const day = moment(report.incidentDate).format("YYYY-MM-DD");
+        if (!acc[day]) acc[day] = 0;
+        acc[day]++;
+        return acc;
+      }, {});
+
+      const reportsByWeekData = reportsData.reduce((acc, report) => {
+        const week = moment(report.incidentDate).format("YYYY-[W]WW");
+        if (!acc[week]) acc[week] = 0;
+        acc[week]++;
+        return acc;
+      }, {});
+
       const reportsByMonthData = reportsData.reduce((acc, report) => {
         const month = moment(report.incidentDate).format("YYYY-MM");
-        if (!acc[month]) {
-          acc[month] = 0;
-        }
+        if (!acc[month]) acc[month] = 0;
         acc[month]++;
         return acc;
       }, {});
 
+      setReportsByDay(reportsByDayData);
+      setReportsByWeek(reportsByWeekData);
       setReportsByMonth(reportsByMonthData);
     } catch (error) {
       console.error("Error fetching reports:", error);
     }
   };
-
 
   const updateReports = (newReports) => {
     setReports((prevReports) => {
@@ -121,11 +170,17 @@ function Dashboard({ username }) {
   };
 
   const chartData = {
-    labels: Object.keys(reportsByMonth),
+    labels: Object.keys(
+      getFilteredData(reportsByDay, reportsByWeek, reportsByMonth)
+    ),
     datasets: [
       {
-        label: "Reports per Month",
-        data: Object.values(reportsByMonth),
+        label: `Reports per ${
+          filter.charAt(0).toUpperCase() + filter.slice(1)
+        }`,
+        data: Object.values(
+          getFilteredData(reportsByDay, reportsByWeek, reportsByMonth)
+        ),
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
@@ -134,17 +189,22 @@ function Dashboard({ username }) {
   };
 
   const lineData = {
-    labels: Object.keys(usersByMonth),
+    labels: Object.keys(getFilteredData(usersByDay, usersByWeek, usersByMonth)),
     datasets: [
       {
-        label: "Resident per Month",
-        data: Object.values(usersByMonth),
-        backgroundColor: "rgba(54, 162, 235, 0.6)", // Blue color
+        label: `Residents per ${
+          filter.charAt(0).toUpperCase() + filter.slice(1)
+        }`,
+        data: Object.values(
+          getFilteredData(usersByDay, usersByWeek, usersByMonth)
+        ),
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
         borderColor: "rgba(54, 162, 235, 1)",
         borderWidth: 1,
       },
     ],
   };
+ 
 
   useEffect(() => {
     fetchReports();
@@ -162,337 +222,9 @@ function Dashboard({ username }) {
   return (
     <>
       <div>
-        <nav className="bg-white border-b border-gray-200 fixed z-30 w-full">
-          <div className="px-3 py-3 lg:px-5 lg:pl-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center justify-start">
-                <button
-                  id="toggleSidebarMobile"
-                  aria-expanded="true"
-                  aria-controls="sidebar"
-                  className="lg:hidden mr-2 text-gray-600 hover:text-gray-900 cursor-pointer p-2 hover:bg-gray-100 focus:bg-gray-100 focus:ring-2 focus:ring-gray-100 rounded"
-                >
-                  <svg
-                    id="toggleSidebarMobileHamburger"
-                    className="w-6 h-6"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h6a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                  <svg
-                    id="toggleSidebarMobileClose"
-                    className="w-6 h-6 hidden"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                      clipRule="evenodd"
-                    ></path>
-                  </svg>
-                </button>
-                <a
-                  href="#"
-                  className="text-xl font-bold flex items-center lg:ml-2.5"
-                >
-                  <img
-                    src={"/logo.png"}
-                    className="h-12 mr-2"
-                    alt="Windster Logo"
-                  />
-                  <span className="self-center whitespace-nowrap">
-                    FixOasis
-                  </span>
-                </a>
-                <form
-                  action="#"
-                  method="GET"
-                  className="hidden lg:block lg:pl-32"
-                >
-                  <label htmlFor="topbar-search" className="sr-only">
-                    Search
-                  </label>
-                  <div className="mt-1 relative lg:w-64">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <svg
-                        className="w-5 h-5 text-gray-500"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                    </div>
-                    <input
-                      type="text"
-                      name="email"
-                      id="topbar-search"
-                      className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full pl-10 p-2.5"
-                      placeholder="Search"
-                    />
-                  </div>
-                </form>
-              </div>
-              <div className="flex items-center">
-                <div className="relative ml-5">
-                  <button
-                    type="button"
-                    className="text-gray-500 hover:text-gray-900 focus:outline-none"
-                  >
-                    <svg
-                      className="w-6 h-6"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M10 2a6 6 0 016 6v3.586l.293.293a1 1 0 01-.707 1.707H4.414a1 1 0 01-.707-1.707L4 11.586V8a6 6 0 016-6z" />
-                      <path d="M12 18a2 2 0 11-4 0h4z" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="dropdown ml-5">
-                  <button
-                    className="btn btn-secondary dropdown-toggle"
-                    type="button"
-                    data-bs-toggle="dropdown"
-                    aria-expanded="false"
-                  >
-                    {username}
-                  </button>
-                  <div
-                    className="dropdown-menu"
-                    aria-labelledby="dropdownMenuButton"
-                  >
-                    <Link className="dropdown-item flex gap-2" to={"/profile"}>
-                      <MdOutlineContactMail className="mt-1 text-xl" />
-                      Perfil
-                    </Link>
-                    <button className="dropdown-item flex gap-2" href="#">
-                      <CgDarkMode className="mt-1 text-xl" />
-                      Dark/Light
-                    </button>
-                    <button
-                      onClick={() => logout()}
-                      className="dropdown-item flex gap-2 text-red-600"
-                    >
-                      <RiLogoutBoxRLine className="mt-1 text-xl" /> Logout
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </nav>
+       <Header username={username} MdOutlineContactMail={MdOutlineContactMail} CgDarkMode={CgDarkMode} Link={Link} RiLogoutBoxRLine={RiLogoutBoxRLine} logout={logout} />
         <div className="flex overflow-hidden bg-white pt-16">
-          <aside
-            id="sidebar"
-            className="fixed hidden z-20 h-full top-0 left-0 pt-16 flex lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75"
-            aria-label="Sidebar"
-          >
-            <div className="relative flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white pt-0">
-              <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-                <div className="flex-1 px-3 bg-white divide-y space-y-1">
-                  <ul className="space-y-2 pb-2">
-                    <li>
-                      <form action="#" method="GET" className="lg:hidden">
-                        <label htmlFor="mobile-search" className="sr-only">
-                          Search
-                        </label>
-                        <div className="relative">
-                          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg
-                              className="w-5 h-5 text-gray-500"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                            </svg>
-                          </div>
-                          <input
-                            type="text"
-                            name="email"
-                            id="mobile-search"
-                            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-cyan-600 focus:ring-cyan-600 block w-full pl-10 p-2.5"
-                            placeholder="Search"
-                          />
-                        </div>
-                      </form>
-                    </li>
-                    <li>
-                      <Link
-                        to={"/reporte"}
-                        className="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 hover:bg-gray-100 group"
-                      >
-                        <svg
-                          className="w-6 h-6 text-gray-500 group-hover:text-gray-900 transition duration-75"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
-                          <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
-                        </svg>
-                        <span className="ml-3">Reports</span>
-                      </Link>
-                    </li>
-
-                    <li>
-                      <Link
-                        to={"/chat"}
-                        className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
-                      >
-                        <svg
-                          className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z"></path>
-                          <path d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"></path>
-                        </svg>
-                        <span className="ml-3 flex-1 whitespace-nowrap">
-                          Inbox
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to={"/residente"}
-                        className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
-                      >
-                        <svg
-                          className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
-                            clipRule="evenodd"
-                          ></path>
-                        </svg>
-                        <span className="ml-3 flex-1 whitespace-nowrap">
-                          Residents
-                        </span>
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to={"/comment"}
-                        className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
-                      >
-                        <MdOutlineContactSupport className="text-xl" />
-
-                        <span className="ml-3 flex-1 whitespace-nowrap">
-                          Social Reports
-                        </span>
-                      </Link>
-                    </li>
-
-                    <li>
-                      <a
-                        href="#"
-                        className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
-                      >
-                        <svg
-                          className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
-                          fill="currentColor"
-                          viewBox="0 0 20 20"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
-                            clipRule="evenodd"
-                          ></path>
-                        </svg>
-                        <span className="ml-3 flex-1 whitespace-nowrap">
-                          Sign Up
-                        </span>
-                      </a>
-                    </li>
-                  </ul>
-                  <div className="space-y-2 pt-2">
-                    <a
-                      href="#"
-                      className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
-                    >
-                      <MdOutlinePayments className="text-xl" />
-                      <span className="ml-4">Payments</span>
-                    </a>
-                    <a
-                      href="#"
-                      target="_blank"
-                      className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
-                    >
-                      <svg
-                        className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
-                        <path
-                          fillRule="evenodd"
-                          d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                      <span className="ml-3">Voices</span>
-                    </a>
-                    <a
-                      href="#"
-                      target="_blank"
-                      className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
-                    >
-                      <svg
-                        className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
-                      </svg>
-                      <span className="ml-3">Amount</span>
-                    </a>
-                    <a
-                      href="#"
-                      target="_blank"
-                      className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
-                    >
-                      <svg
-                        className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-.08.08-1.53-1.533A5.98 5.98 0 004 10c0 .954.223 1.856.619 2.657l1.54-1.54zm1.088-6.45A5.974 5.974 0 0110 4c.954 0 1.856.223 2.657.619l-1.54 1.54a4.002 4.002 0 00-2.346.033L7.246 4.668zM12 10a2 2 0 11-4 0 2 2 0 014 0z"
-                          clipRule="evenodd"
-                        ></path>
-                      </svg>
-                      <span className="ml-3">Help</span>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </aside>
+         <Sidebar MdOutlinePayments={MdOutlinePayments} Link={Link} MdOutlineContactSupport={MdOutlineContactSupport}/>
           <div
             className="bg-gray-900 opacity-50 hidden fixed inset-0 z-10"
             id="sidebarBackdrop"
@@ -530,21 +262,31 @@ function Dashboard({ username }) {
                         </svg>
                       </div>
                     </div>
+                    <div className="flex items-center mb-4">
+                      <select
+                        value={filter}
+                        onChange={(e) => setFilter(e.target.value)}
+                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                      >
+                        <option value="day">Day</option>
+                        <option value="week">Week</option>
+                        <option value="month">Month</option>
+                      </select>
+                    </div>
                     <div id="main-chart">
                       <Bar data={chartData} />
                     </div>
                     <div className="mt-4">
-                       <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900 mt-4">
-                      {totalUsersCount}
-                    </span>
-                    <h3 className="text-base font-normal text-gray-500">
-                      Residents
-                    </h3>
-                    <div id="main-chart">
-                      <Line data={lineData} />
+                      <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900 mt-4">
+                        {totalUsersCount}
+                      </span>
+                      <h3 className="text-base font-normal text-gray-500">
+                        Residents
+                      </h3>
+                      <div id="main-chart">
+                        <Line data={lineData} />
+                      </div>
                     </div>
-                    </div>
-                   
                   </div>
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
                     <div className="mb-4 flex items-center justify-between">
@@ -1005,7 +747,7 @@ function Dashboard({ username }) {
               <a href="#" className="hover:underline" target="_blank">
                 NanorayDev
               </a>
-              . All rights reserved.
+
             </p>
           </div>
         </div>

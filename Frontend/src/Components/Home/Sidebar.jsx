@@ -1,135 +1,201 @@
-import { useContext, useState } from "react";
-// Icons
-import {
-  RiMore2Fill,
-  RiCloseFill,
-  RiLogoutBoxRLine,
-} from "react-icons/ri";
-import { AiOutlineLock, AiOutlineUsergroupAdd } from "react-icons/ai";
-import { TbReportSearch } from "react-icons/tb";
-import { PiChats } from "react-icons/pi";
-import { FcVoicePresentation } from "react-icons/fc";
-import { CgDarkMode } from "react-icons/cg";
-import { TbSettingsPlus } from "react-icons/tb";
-import axios from "axios";
-import { UserContext } from "../../UserContext";
-import { Link, Outlet, useNavigate } from "react-router-dom";
-import logo from "/logo.png";
-import { TreeNode } from "./TreeNode";
-
-const Sidebar = ({ username }) => {
-  const { id, setId, setUsername } = useContext(UserContext);
-  const [ws, setWs] = useState(null);
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [showMenu, setShowMenu] = useState(false);
-  const history = useNavigate();
-
-  const toggleMenu = () => {
-    setIsOpen(!isOpen);
-  };
-
-  const handleMouseLeave = () => {
-    setIsOpen(false)
-  }
-
-  function logout() {
-    axios.post("/logout").then(() => {
-      setWs(null);
-      setId(null);
-      setUsername(null);
-      setIsLoggedIn(false);
-      history('/')
-    });
-  }
+const Sidebar = ({ MdOutlinePayments, Link, MdOutlineContactSupport }) => {
   return (
     <>
-      <div
-        className={`bg-primary-300/10 h-full fixed lg:static w-[80%] md:w-[40%] lg:w-full transition-all z-50 duration-300 ${
-          showMenu ? "left-0" : "-left-full"
-        }`}
+      <aside
+        id="sidebar"
+        className="fixed hidden z-20 h-full top-0 left-0 pt-16 flex-1 lg:flex flex-shrink-0 flex-col w-64 transition-width duration-75"
+        aria-label="Sidebar"
       >
-        {/* Profile */}
-        <div className="flex flex-col items-center justify-center p-8 gap-2 h-[30vh] ">
-          <img
-            src={logo}
-            className="w-24 h-24 object-cover rounded-full ring-2 ring-blue-300 bg-blue-50"
-          />
-          <h1 className="text-xl  text-gray-500  tracking-wider font-bold uppercase ">
-            {"fix"}
-            <span className="text-orange-400">oasis</span>
-          </h1>
+        <div className="relative flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white pt-0">
+          <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
+            <div className="flex-1 px-3 bg-white divide-y space-y-1">
+              <ul className="space-y-2 pb-2">
+                <li>
+                  <form action="#" method="GET" className="lg:hidden">
+                    <label htmlFor="mobile-search" className="sr-only">
+                      Search
+                    </label>
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg
+                          className="w-5 h-5 text-gray-500"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+                        </svg>
+                      </div>
+                      <input
+                        type="text"
+                        name="email"
+                        id="mobile-search"
+                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-cyan-600 block w-full pl-10 p-2.5"
+                        placeholder="Search"
+                      />
+                    </div>
+                  </form>
+                </li>
+                <li>
+                  <Link
+                    to={"/reporte"}
+                    className="text-base text-gray-900 font-normal rounded-lg flex items-center p-2 hover:bg-gray-100 group"
+                  >
+                    <svg
+                      className="w-6 h-6 text-gray-500 group-hover:text-gray-900 transition duration-75"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z"></path>
+                      <path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z"></path>
+                    </svg>
+                    <span className="ml-3">Reports</span>
+                  </Link>
+                </li>
 
-        </div>
-        {/* Nav */}
-        <div className="bg-white p-8 rounded-tr-[100px] h-[70vh] overflow-y-scroll flex flex-col justify-between gap-8">
-          <nav className="flex flex-col gap-8">
-            <Link
-              to="/reporte"
-              href="#"
-              className="flex items-center gap-4 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
-            >
-              <TbReportSearch /> Reports
-            </Link>
-            <Link
-              to="/residente"
-              href="#"
-              className="flex items-center gap-4 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
-            >
-              <AiOutlineUsergroupAdd /> Residents
-            </Link>
+                <li>
+                  <Link
+                    to={"/chat"}
+                    className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
+                  >
+                    <svg
+                      className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z"></path>
+                      <path d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"></path>
+                    </svg>
+                    <span className="ml-3 flex-1 whitespace-nowrap">Inbox</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"/residente"}
+                    className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
+                  >
+                    <svg
+                      className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    <span className="ml-3 flex-1 whitespace-nowrap">
+                      Residents
+                    </span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to={"/comment"}
+                    className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
+                  >
+                    <MdOutlineContactSupport className="text-xl" />
 
-            <Link
-              to="/profile"
-              href="#"
-              className="flex items-center gap-4 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
-            >
-              <FcVoicePresentation /> My Profile
-            </Link>
-            <Link
-              to="/chat"
-              href="#"
-              className="flex items-center gap-4 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
-            >
-              <PiChats /> ChatReports
-            </Link>
+                    <span className="ml-3 flex-1 whitespace-nowrap">
+                      Social Reports
+                    </span>
+                  </Link>
+                </li>
 
-            <div className="relative" >
-              <button
-                onClick={toggleMenu}
-                
-                className="flex items-center gap-2 text-black py-2 px-4 rounded-xl hover:bg-primary-900/50 transition-colors"
-              >
-                <TbSettingsPlus /> Settings
-              </button>
-              {isOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1" onMouseLeave={handleMouseLeave}>
-                  <button onClick={logout} className="w-48" >
-                    <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
-                  </button>
-                  <TreeNode
-                    icon={<CgDarkMode />}
-                    label="Dark/Light"
-                    to="#"
-                  />
-                </div>
-              )}
+                <li>
+                  <a
+                    href="#"
+                    className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 flex items-center p-2 group "
+                  >
+                    <svg
+                      className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5 4a3 3 0 00-3 3v6a3 3 0 003 3h10a3 3 0 003-3V7a3 3 0 00-3-3H5zm-1 9v-1h5v2H5a1 1 0 01-1-1zm7 1h4a1 1 0 001-1v-1h-5v2zm0-4h5V8h-5v2zM9 8H4v2h5V8z"
+                        clipRule="evenodd"
+                      ></path>
+                    </svg>
+                    <span className="ml-3 flex-1 whitespace-nowrap">
+                      Sign Up
+                    </span>
+                  </a>
+                </li>
+              </ul>
+              <div className="space-y-2 pt-2">
+                <a
+                  href="#"
+                  className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
+                >
+                  <MdOutlinePayments className="text-xl" />
+                  <span className="ml-4">Payments</span>
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"></path>
+                    <path
+                      fillRule="evenodd"
+                      d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  <span className="ml-3">Voices</span>
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path>
+                  </svg>
+                  <span className="ml-3">Amount</span>
+                </a>
+                <a
+                  href="#"
+                  target="_blank"
+                  className="text-base text-gray-900 font-normal rounded-lg hover:bg-gray-100 group transition duration-75 flex items-center p-2"
+                >
+                  <svg
+                    className="w-6 h-6 text-gray-500 flex-shrink-0 group-hover:text-gray-900 transition duration-75"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-2 0c0 .993-.241 1.929-.668 2.754l-1.524-1.525a3.997 3.997 0 00.078-2.183l1.562-1.562C15.802 8.249 16 9.1 16 10zm-5.165 3.913l1.58 1.58A5.98 5.98 0 0110 16a5.976 5.976 0 01-2.516-.552l1.562-1.562a4.006 4.006 0 001.789.027zm-4.677-2.796a4.002 4.002 0 01-.041-2.08l-.08.08-1.53-1.533A5.98 5.98 0 004 10c0 .954.223 1.856.619 2.657l1.54-1.54zm1.088-6.45A5.974 5.974 0 0110 4c.954 0 1.856.223 2.657.619l-1.54 1.54a4.002 4.002 0 00-2.346.033L7.246 4.668zM12 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      clipRule="evenodd"
+                    ></path>
+                  </svg>
+                  <span className="ml-3">Help</span>
+                </a>
+              </div>
             </div>
-          </nav>
-          <Outlet />
-          <div className="bg-primary-100 text-black p-4 rounded-xl">
-            <p className="text-gray-400">Having troubles?</p>
-            <a href="#">Contact us</a>
           </div>
         </div>
-      </div>
-      {/* Button mobile */}
-      <button
-        onClick={() => setShowMenu(!showMenu)}
-        className="lg:hidden fixed right-4 bottom-4 text-2xl bg-primary-900 p-2.5 rounded-full text-white z-50"
-      >
-        {showMenu ? <RiCloseFill /> : <RiMore2Fill />}
-      </button>
+      </aside>
     </>
   );
 };
