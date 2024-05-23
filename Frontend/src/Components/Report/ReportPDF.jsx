@@ -18,7 +18,6 @@ const ReportPDF = ({ report }) => (
       <View style={styles.section}>
         <Text>{report.createdBy}</Text>
         <Text>{report.createdAt}</Text>
-        {/* Agrega otros campos del reporte aquí */}
       </View>
     </Page>
   </Document>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { saveAs } from "file-saver";
 import { Outlet } from "react-router-dom";
@@ -8,6 +8,8 @@ import CreateReport from "./CreateReport";
 import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
 import { TbEyeSearch, TbReportOff, TbSend } from "react-icons/tb";
+import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
+import { UserContext } from "../../UserContext";
 
 const ReportForm = ({ handleSubmit }) => {
   const [reports, setReports] = useState([]);
@@ -17,7 +19,8 @@ const ReportForm = ({ handleSubmit }) => {
   const itemsPerPage = 6; // Número de elementos por página
   const [searchTerm, setSearchTerm] = useState("");
   const [users, setUsers] = useState([]);
-  const [dateFilter, setDateFilter] = useState("all"); // Estado para el filtro de fechas
+  const [dateFilter, setDateFilter] = useState("all"); 
+  const {role} = useContext(UserContext)
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -229,7 +232,7 @@ const ReportForm = ({ handleSubmit }) => {
         )}
         <div>
           <h4 className="px-6 py-3 bg-gray-50 text-left text-xl leading-4 font-bold text-gray-500 uppercase tracking-wider rounded-md ">
-            Reports
+             {role === 'admin' ? ' Reports of all residents': "Your Reports"}
           </h4>
         </div>
         <div className="max-h-[450px] overflow-y-auto">
@@ -346,7 +349,7 @@ const ReportForm = ({ handleSubmit }) => {
               className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${currentPage === 1 ? "cursor-not-allowed" : ""
                 }`}
             >
-              &#8592; {/* Flecha hacia la izquierda */}
+             <MdArrowBackIosNew /> {/* Flecha hacia la izquierda */}
             </button>
 
             <button
@@ -355,7 +358,7 @@ const ReportForm = ({ handleSubmit }) => {
               className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${indexOfLastItem >= filteredAndDateFilteredReports.length ? "cursor-not-allowed" : ""
                 }`}
             >
-              &#8594; {/* Flecha hacia la derecha */}
+              <MdArrowForwardIos /> {/* Flecha hacia la derecha */}
             </button>
           </div>
         </div>

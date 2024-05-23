@@ -23,23 +23,32 @@ function Profile({ username, setIsLoggedIn }) {
   const [showAlert, setShowAlert] = useState(false);
   const { role } = useContext(UserContext);
 
+  const getRandomProfileImage = () => {
+    const randomId = Math.floor(Math.random() * 100) + 1;
+    return `https://randomuser.me/api/portraits/thumb/men/${randomId}.jpg`;
+  };
+
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const token = localStorage.getItem("token"); // Obtener el token de localStorage o de donde lo almacenes
-        const response = await axios.get("/user", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setUser(response.data);
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-      }
-    };
+    
 
     fetchUserData();
   }, []);
+
+  const fetchUserData = async () => {
+    try {
+      const token = localStorage.getItem("token"); // Obtener el token de localStorage o de donde lo almacenes
+      const response = await axios.get("/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const userData = response.data;
+      userData.profileImage = getRandomProfileImage();
+      setUser(userData);
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
   const notifySuccess = () => toast.success("User data updated successfully");
   const notifyError = () => toast.error("Error updating user data");
@@ -73,7 +82,6 @@ function Profile({ username, setIsLoggedIn }) {
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      // Realizar acciones con el archivo, como subirlo al servidor o previsualizarlo
       setAvatar(file);
     }
   };
@@ -91,7 +99,6 @@ function Profile({ username, setIsLoggedIn }) {
       <Navigation setIsLoggedIn={setIsLoggedIn} />
       <ToastContainer />
 
-      {/* Include the above in your HEAD tag */}
       <div className="container mx-auto py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Avatar y Estadísticas */}
@@ -120,7 +127,7 @@ function Profile({ username, setIsLoggedIn }) {
                       />
                     }
                   >
-                   <Link to={"/comment"}>Social Reports</Link>
+                    <Link to={"/comment"}>Social Reports</Link>
                   </Menu.Item>
                   <Menu.Item
                     leftSection={
@@ -161,6 +168,8 @@ function Profile({ username, setIsLoggedIn }) {
                   src={
                     avatar
                       ? URL.createObjectURL(avatar)
+                      : user.profileImage
+                      ? user.profileImage
                       : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
                   }
                   className="w-32 h-32 mx-auto rounded-full mb-4"
@@ -349,8 +358,6 @@ function Profile({ username, setIsLoggedIn }) {
                 </div>
               </div>
 
-              {/* Agregar más campos de formulario aquí */}
-
               <div className="flex justify-end">
                 <button
                   type="submit"
@@ -371,7 +378,7 @@ function Profile({ username, setIsLoggedIn }) {
         </div>
       </div>
 
-      {/* /.container */}
+
     </>
   );
 }

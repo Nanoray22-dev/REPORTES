@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Comments from "./Comments";
 import Navigation from "../Home/Navigation";
-import { Spinner } from "@chakra-ui/react"; // Añade un spinner para la carga
+import { Spinner } from "@chakra-ui/react"; 
 import logo from '/logo.png';
 const SocialReports = () => {
   const [reports, setReports] = useState([]);

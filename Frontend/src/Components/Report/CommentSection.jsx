@@ -60,12 +60,12 @@ const CommentSection = ({ reportId }) => {
       socket.emit('leaveReport', reportId);
       socket.disconnect();
     };
-  }, [reportId, socket]);  // Agregar socket como dependencia
+  }, [reportId, socket]);  
 
   const handleAddComment = async () => {
     try {
       const response = await axios.post(`/report/${reportId}/comment`, { text: newComment });
-      // Utiliza el valor de response si es necesario
+
       console.log(response.data); 
       setNewComment('');
     } catch (error) {
@@ -76,7 +76,7 @@ const CommentSection = ({ reportId }) => {
   const handleEditComment = async (commentId) => {
     try {
       const response = await axios.put(`/report/${reportId}/comment/${commentId}`, { text: editingText });
-      // Utiliza el valor de response si es necesario
+
       console.log(response.data); 
       setEditingCommentId(null);
       setEditingText('');

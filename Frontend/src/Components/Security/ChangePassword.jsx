@@ -14,12 +14,6 @@ function ChangePassword() {
   const [showModal, setShowModal] = useState(false);
   const navigate = useNavigate();
   const { username } = useContext(UserContext);
-  // const [formData, setFormData] = useState({
-  //   from: "onboarding@resend.dev",
-  //   to: "",
-  //   subject: "",
-  //   html: "",
-  // });
 
   const openModal = () => {
     setShowModal(true);
@@ -29,29 +23,23 @@ function ChangePassword() {
     setShowModal(false);
   };
 
-  // const handleChange = (e) => {
-  //   const { name, value } = e.target;
-  //   setFormData({ ...formData, [name]: value });
-  // };
-
   const handleSend = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('/api/sendPasswordRecoveryEmail', {
-        method: 'POST',
+      const response = await axios.post("/api/sendPasswordRecoveryEmail", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ email })
+        body: JSON.stringify({ email }),
       });
-      
-      const data = await response.json();
 
+      const data = await response.json();
 
       console.log(data.message);
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -272,7 +260,6 @@ function ChangePassword() {
             <h3 className="text-blue-500 dark:text-blue-400 sm:w-1/2">
               <Link to={"/profile"}> Back to profile</Link>
             </h3>
-           
           </div>
         </div>
       </section>

@@ -29,7 +29,7 @@ function Dashboard({ username }) {
   const [reportsByMonth, setReportsByMonth] = useState({});
 
   const getRandomProfileImage = () => {
-    const randomId = Math.floor(Math.random() * 100) + 1; // Generate a random number between 1 and 100
+    const randomId = Math.floor(Math.random() * 100) + 1;
     return `https://randomuser.me/api/portraits/thumb/men/${randomId}.jpg`;
   };
 
@@ -95,14 +95,6 @@ function Dashboard({ username }) {
     }
   };
 
-
-  // const addNewReport = (newReport) => {
-  //   // Function to add a new report and maintain the LIFO order
-  //   setReports(prevReports => {
-  //     const updatedReports = [newReport, ...prevReports];
-  //     return updatedReports.slice(-10);
-  //   });
-  // };
 
   const updateReports = (newReports) => {
     setReports((prevReports) => {
@@ -1009,16 +1001,14 @@ function Dashboard({ username }) {
               </div>
             </footer>
             <p className="text-center text-sm text-gray-500 my-10">
-              &copy; 2019-2021{" "}
+              &copy; 2024{" "}
               <a href="#" className="hover:underline" target="_blank">
-                Themesberg
+                NanorayDev
               </a>
               . All rights reserved.
             </p>
           </div>
         </div>
-        <script async defer src="https://buttons.github.io/buttons.js"></script>
-        <script src="https://demo.themesberg.com/windster/app.bundle.js"></script>
       </div>
     </>
   );

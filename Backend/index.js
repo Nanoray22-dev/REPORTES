@@ -118,12 +118,16 @@ app.post("/login", async (req, res) => {
         {},
         (err, token) => {
           if (err) {
-            res.status(500).json({ message: "Error en la generación del token" });
+            res
+              .status(500)
+              .json({ message: "Error en la generación del token" });
           } else {
-            res.cookie("token", token, { sameSite: "none", secure: true }).json({
-              id: foundUser._id,
-              role: foundUser.role,
-            });
+            res
+              .cookie("token", token, { sameSite: "none", secure: true })
+              .json({
+                id: foundUser._id,
+                role: foundUser.role,
+              });
           }
         }
       );
@@ -279,8 +283,6 @@ const upload = multer({ storage: storage });
 const baseUrl = process.env.BASE_URL;
 const { Resend } = require("resend");
 const resend = new Resend(process.env.RESEND_API_KEY);
-
-
 
 app.get("/report", async (req, res) => {
   try {
@@ -494,8 +496,6 @@ app.put("/mark-report-reviewed/:reportId", async (req, res) => {
   }
 });
 
-
-// Ruta para agregar un comentario a un reporte
 app.post("/report/:id/comment", async (req, res) => {
   try {
     const { text } = req.body;
@@ -530,7 +530,7 @@ app.post("/report/:id/comment", async (req, res) => {
     const newComment = report.comments[report.comments.length - 1];
     newComment.createdBy = user;
 
-    io.to(reportId).emit("newComment", newComment); 
+    io.to(reportId).emit("newComment", newComment);
 
     res.status(201).json(newComment);
   } catch (error) {
@@ -539,9 +539,6 @@ app.post("/report/:id/comment", async (req, res) => {
   }
 });
 
-
-
-// Ruta para obtener los comentarios de un reporte
 app.get("/report/:id/comments", async (req, res) => {
   try {
     const reportId = req.params.id;
@@ -559,25 +556,6 @@ app.get("/report/:id/comments", async (req, res) => {
   }
 });
 
-// app.get("/report/:id/comments", async (req, res) => {
-//   try {
-//     const reportId = req.params.id;
-//     const report = await Report.findById(reportId).populate(
-//       "comments.createdBy",
-//       "username"
-//     );
-//     if (!report) {
-//       return res.status(404).json({ error: "Report not found" });
-//     }
-//     res.status(200).json(report.comments);
-//   } catch (error) {
-//     console.error("Error fetching comments:", error);
-//     res.status(500).json({ error: "Error fetching comments" });
-//   }
-// });
-
-
-// Ruta para editar un comentario
 app.put("/report/:reportId/comment/:commentId", async (req, res) => {
   try {
     const { text } = req.body;
@@ -614,7 +592,6 @@ app.put("/report/:reportId/comment/:commentId", async (req, res) => {
   }
 });
 
-// Ruta para eliminar un comentario
 app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
   try {
     const { reportId, commentId } = req.params;
@@ -642,21 +619,6 @@ app.delete("/report/:reportId/comment/:commentId", async (req, res) => {
     res.status(500).json({ error: "Error deleting comment" });
   }
 });
-
-// app.get('/user/:userId/reports', async (req, res) => {
-//   try {
-//     const userId = req.params.userId;
-//     if (!mongoose.Types.ObjectId.isValid(userId)) {
-//       return res.status(400).json({ error: 'Invalid user ID' });
-//     }
-
-//     const reports = await Report.find({ createdBy: mongoose.Types.ObjectId(userId) });
-//     res.status(200).json(reports);
-//   } catch (error) {
-//     console.error('Error fetching user reports:', error);
-//     res.status(500).json({ error: 'Error fetching user reports' });
-//   }
-// });
 
 app.get("/user/:userId/reports", async (req, res) => {
   try {
@@ -853,11 +815,9 @@ async function getUserDataFromRequest(req) {
   });
 }
 
-// Ruta para cargar la imagen de perfil del usuario
 const storages = multer.memoryStorage();
 const uploads = multer({ storages });
 
-// Ruta para actualizar los datos del usuario y la imagen de perfil
 app.put("/user", uploads.single("profileImage"), async (req, res) => {
   try {
     const userData = await getUserDataFromRequest(req);
@@ -901,13 +861,6 @@ app.put("/user", uploads.single("profileImage"), async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-// Define la ruta para enviar el correo de recuperación de contraseña
 app.post("/api/sendPasswordRecoveryEmail", async (req, res) => {
   const { email } = req.body;
 
@@ -930,8 +883,6 @@ app.post("/api/sendPasswordRecoveryEmail", async (req, res) => {
   }
 });
 
-
-// Middleware para verificar el token de autenticación
 const authenticateUser = (req, res, next) => {
   try {
     const token = req.cookies?.token;
@@ -946,7 +897,6 @@ const authenticateUser = (req, res, next) => {
   }
 };
 
-// Endpoint para obtener los datos del usuario actual
 app.get("/user/me", authenticateUser, async (req, res) => {
   try {
     const userId = req.userId;

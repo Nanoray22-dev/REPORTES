@@ -120,12 +120,6 @@ const Sidebar = ({ username }) => {
           <div className="bg-primary-100 text-black p-4 rounded-xl">
             <p className="text-gray-400">Having troubles?</p>
             <a href="#">Contact us</a>
-            {/* <button
-              onClick={logout}
-              className="text-sm bg-blue-100 py-1 px-3  text-gray-500 border rounded-sm "
-            >
-              logout
-            </button> */}
           </div>
         </div>
       </div>

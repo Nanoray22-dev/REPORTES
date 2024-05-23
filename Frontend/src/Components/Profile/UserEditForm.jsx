@@ -32,9 +32,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
       const response = await axios.put(`/users/${userId}`, user);
       setUser(response.data);
       notifySuccess();
-      // Llamar a la función onUserUpdated con los datos del usuario actualizado
       onUserUpdated(response.data);
-      // Cerrar el formulario después de mostrar el SweetAlert
       closeModal();
     } catch (error) {
       console.error("Error updating user:", error);
