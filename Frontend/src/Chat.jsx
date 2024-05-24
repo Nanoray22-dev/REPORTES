@@ -1,11 +1,9 @@
 import { useContext, useEffect, useRef, useState } from "react";
-// import Avatar from "./Avatar";
 import Logo from "./Logo";
 import { UserContext } from "./UserContext.jsx";
 import { uniqBy } from "lodash";
 import axios from "axios";
 import Contact from "./Contact";
-import { Link, Outlet } from "react-router-dom";
 import Navigation from "./Components/Home/Navigation.jsx";
 
 export default function Chat() {
@@ -15,7 +13,7 @@ export default function Chat() {
   const [selectedUserId, setSelectedUserId] = useState(null);
   const [newMessageText, setNewMessageText] = useState("");
   const [messages, setMessages] = useState([]);
-  const { username, id, setId, setUsername } = useContext(UserContext);
+  const { username, id  } = useContext(UserContext);
   const divUnderMessages = useRef();
   useEffect(() => {
     connectToWs();
@@ -128,6 +126,8 @@ export default function Chat() {
 
   return (
     <>
+    <title>Report Chat</title>
+
       <div className="flex h-screen">
         <div className="bg-white w-1/5 flex flex-col">
           <div className="flex-grow">
@@ -173,12 +173,6 @@ export default function Chat() {
               </svg>
               {username}
             </span>
-            {/* <button
-              onClick={logout}
-              className="text-sm bg-blue-100 py-1 px-2 text-gray-500 border rounded-sm"
-            >
-              logout
-            </button> */}
           </div>
         </div>
 
@@ -293,7 +287,6 @@ export default function Chat() {
             </form>
           )}
         </div>
-        <Outlet />
       </div>
     </>
   );

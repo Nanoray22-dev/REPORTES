@@ -14,27 +14,47 @@ import "chart.js/auto";
 import moment from "moment";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
+import UseReport from "./hooks/UseReport";
+import User from "./hooks/User";
 
 function Dashboard({ username }) {
   const history = useNavigate();
   const { setId, setUsername } = useContext(UserContext);
   const [, setWs] = useState(null);
-  const [pendingReportsCount, setPendingReportsCount] = useState(0);
-  const [inProgressReportsCount, setInProgressReportsCount] = useState(0);
-  const [completedReportsCount, setCompletedReportsCount] = useState(0);
-  const [totalReportsCount, setTotalReportsCount] = useState(0);
-  const [reports, setReports] = useState([]);
-  const [users, setUsers] = useState([]);
-  const [totalUsersCount, setTotalUsersCount] = useState(0);
-  const [usersByMonth, setUsersByMonth] = useState({});
-  const [reportsByMonth, setReportsByMonth] = useState({});
-  const [usersByDay, setUsersByDay] = useState({});
-  const [usersByWeek, setUsersByWeek] = useState({});
-  const [reportsByDay, setReportsByDay] = useState({});
-  const [reportsByWeek, setReportsByWeek] = useState({});
   const [filter, setFilter] = useState("month");
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const {
+    users,
+    setUsers,
+    totalUsersCount,
+    setTotalUsersCount,
+    usersByMonth,
+    setUsersByMonth,
+    usersByDay,
+    setUsersByDay,
+    usersByWeek,
+    setUsersByWeek,
+  } = User();
+  const {
+    pendingReportsCount,
+    setPendingReportsCount,
+    inProgressReportsCount,
+    setInProgressReportsCount,
+    completedReportsCount,
+    setCompletedReportsCount,
+    totalReportsCount,
+    setTotalReportsCount,
+    reports,
+    setReports,
+    reportsByDay,
+    setReportsByDay,
+    reportsByWeek,
+    setReportsByWeek,
+    reportsByMonth,
+    setReportsByMonth,
+  } = UseReport();
+
   const getRandomProfileImage = () => {
     const randomId = Math.floor(Math.random() * 100) + 1;
     return `https://randomuser.me/api/portraits/thumb/men/${randomId}.jpg`;
@@ -247,6 +267,7 @@ function Dashboard({ username }) {
   }
   return (
     <>
+    <title>Dashboard</title>
       <div>
         <Header
           username={username}

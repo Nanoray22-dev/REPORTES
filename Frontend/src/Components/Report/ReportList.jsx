@@ -36,6 +36,9 @@ const ReportList = ({
     : [report.image];
 
   return (
+    <>
+    <title>View Report</title>
+
     <div key={report._id} className="bg-white rounded-lg shadow-lg p-6 mb-4">
       <div className="flex items-center mb-4">
         <img src={logo} alt="Logo" className="h-16 w-16 mr-4 rounded-full" />
@@ -110,6 +113,8 @@ const ReportList = ({
         </button>
       </div>
     </div>
+    </>
+    
   );
 };
 

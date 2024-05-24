@@ -77,6 +77,7 @@ function ChangePassword() {
 
   return (
     <>
+    <title>Change password</title>
       <Navigation />
       <section className="bg-gray-50 dark:bg-gray-50">
         <div className="container px-6 py-24 mx-auto lg:py-32">

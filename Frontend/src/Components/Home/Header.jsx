@@ -61,8 +61,15 @@ const Header = ({
                 ></path>
               </svg>
             </button>
-            <a href="#" className="text-xl font-bold flex items-center lg:ml-2.5">
-              <img src={"/logo.png"} className="h-12 mr-2" alt="Windster Logo" />
+            <a
+              href="#"
+              className="text-xl font-bold flex items-center lg:ml-2.5"
+            >
+              <img
+                src={"/logo.png"}
+                className="h-12 mr-2"
+                alt="Windster Logo"
+              />
               <p className="text-gray-500">
                 Fix
                 <span className="self-center whitespace-nowrap text-orange-500">
@@ -114,15 +121,21 @@ const Header = ({
               {showNotifications && (
                 <div className="absolute top-16 right-4 w-80 bg-white shadow-lg rounded-lg z-20 overflow-y-auto max-h-80">
                   <div className="py-2">
-                    {notifications.map((notification) => (
+                    {notifications.map((notification, index) => (
                       <div
-                        key={notification.id}
+                        key={index}
                         className="px-4 py-3 border-b border-gray-200 last:border-b-0 hover:bg-gray-50 transition-colors duration-300"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
                             <div className="flex-shrink-0">
-                              <FaBell className="w-6 h-6 text-gray-500" />
+                              <img
+                                src={
+                                  "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
+                                }
+                                alt="Profile"
+                                className="w-10 h-10 rounded-full mr-3"
+                              />
                             </div>
                             <div className="flex flex-col">
                               <span className="text-sm font-medium text-gray-900">
@@ -152,7 +165,10 @@ const Header = ({
               >
                 {username}
               </button>
-              <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              <div
+                className="dropdown-menu"
+                aria-labelledby="dropdownMenuButton"
+              >
                 <Link className="dropdown-item flex gap-2" to={"/profile"}>
                   <MdOutlineContactMail className="mt-1 text-xl" />
                   Perfil

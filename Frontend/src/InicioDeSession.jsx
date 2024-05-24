@@ -6,10 +6,9 @@ import PreLoader from "./Components/Helpers/PreLoader.jsx";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 
-export default function RegisterAndLoginForm() {
+export default function RegisterAndLoginForm({notification}) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [notification, setNotification] = useState(null);
   const [isLoginOrRegister, setIsLoginOrRegister] = useState("login");
   const { setUsername: setLoggedInUsername, setId, setRole } = useContext(UserContext);
   const [isLoading, setIsLoading] = useState(false);
@@ -82,7 +81,10 @@ export default function RegisterAndLoginForm() {
   }
 
   return (
-    <div className="bg-gray-900">
+    <>
+    <title>FixOasis</title>
+
+     <div className="bg-gray-900">
       {isLoading ? (
         <PreLoader />
       ) : (
@@ -212,5 +214,7 @@ export default function RegisterAndLoginForm() {
         </div>
       )}
     </div>
+    </>
+   
   );
 }

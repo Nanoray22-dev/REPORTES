@@ -16,7 +16,7 @@ import {
 import { Link } from "react-router-dom";
 import { UserContext } from "../../UserContext";
 
-function Profile({ username, setIsLoggedIn }) {
+function Profile({  setIsLoggedIn }) {
   const [user, setUser] = useState(null);
   const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -63,7 +63,6 @@ function Profile({ username, setIsLoggedIn }) {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("User data updated successfully");
       setShowAlert(true);
       notifySuccess();
     } catch (error) {
@@ -96,6 +95,9 @@ function Profile({ username, setIsLoggedIn }) {
 
   return (
     <>
+    {showAlert}
+    <title>Profile</title>
+
       <Navigation setIsLoggedIn={setIsLoggedIn} />
       <ToastContainer />
 

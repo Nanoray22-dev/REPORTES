@@ -4,12 +4,13 @@ import Comments from "./Comments";
 import Navigation from "../Home/Navigation";
 import { Spinner } from "@chakra-ui/react";
 import logo from "/logo.png";
-const SocialReports = () => {
+import { FaArrowUp } from "react-icons/fa";
+const SocialReports = ({avatar}) => {
   const [reports, setReports] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [avatar, setAvatar] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
 
   useEffect(() => {
     fetchReports();
@@ -25,6 +26,23 @@ const SocialReports = () => {
       }
     };
   }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   const fetchReports = async () => {
     try {
       const response = await axios.get("/reports");
@@ -38,6 +56,11 @@ const SocialReports = () => {
       setLoading(false);
     }
   };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   const filteredReports = reports.filter((report) => {
     const title = report.title?.toLowerCase() || "";
     const description = report.description?.toLowerCase() || "";
@@ -52,6 +75,8 @@ const SocialReports = () => {
 
   return (
     <>
+    <title>Social Report</title>
+
       <Navigation />
       <div className="container mx-auto p-4 max-w-3xl">
         <div className="flex">
@@ -90,6 +115,14 @@ const SocialReports = () => {
               <ReportCard key={report._id} report={report} avatar={avatar} />
             ))}
           </div>
+        )}
+        {showScrollButton && (
+          <button
+            onClick={scrollToTop}
+            className="fixed bottom-10 right-10 p-3 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-700 transition"
+          >
+            <FaArrowUp />Top
+          </button>
         )}
       </div>
     </>

@@ -11,14 +11,13 @@ import { TbEyeSearch, TbReportOff, TbSend } from "react-icons/tb";
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
 import { UserContext } from "../../UserContext";
 
-const ReportForm = ({ handleSubmit }) => {
+const ReportForm = ({ handleSubmit, users }) => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; // Número de elementos por página
+  const itemsPerPage = 6; 
   const [searchTerm, setSearchTerm] = useState("");
-  const [users, setUsers] = useState([]);
   const [dateFilter, setDateFilter] = useState("all"); 
   const {role} = useContext(UserContext)
 
@@ -177,6 +176,8 @@ const ReportForm = ({ handleSubmit }) => {
 
   return (
     <>
+    <title>Reports</title>
+
       <Navigation />
       <div className="container mx-auto">
         <div className="flex items-center justify-evenly p-4">

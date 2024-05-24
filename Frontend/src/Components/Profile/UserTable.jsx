@@ -73,6 +73,8 @@ const UserTable = () => {
 
   return (
     <>
+    <title>Residents</title>
+
       <Navigation />
       <div className="container mx-auto">
         <div className="mb-4 flex p-2">
