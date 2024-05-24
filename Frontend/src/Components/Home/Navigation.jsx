@@ -102,7 +102,7 @@ const Navigation = () => {
                     label="Dark/Light"
                     to="#"
                   />
-                  <button onClick={() => logout()} className="w-48 hover:text-black">
+                  <button onClick={() => logout()} className="w-48 hover:text-red-500 text-red-500">
                     <TreeNode icon={<RiLogoutBoxRLine />} label="Logout" />
                   </button>
                 </div>
