@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import moment from 'moment';
-import io from 'socket.io-client';
 import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
-const socket = io();
+
 
 const Comments = ({ reportId }) => {
   const [comments, setComments] = useState([]);
