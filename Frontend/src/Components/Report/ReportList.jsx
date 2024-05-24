@@ -93,7 +93,7 @@ const ReportList = ({
             className="flex-1 p-2 mr-4 border rounded-md bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
           >
             <option value="PENDING">Pendiente</option>
-            <option value="IN_PROGRESS">En Progreso</option>
+            <option value="PROGRESS">En Progreso</option>
             <option value="COMPLETED">Completado</option>
             <option value="CLOSED">Cerrado</option>
             <option value="REJECTED">Rechazado</option>

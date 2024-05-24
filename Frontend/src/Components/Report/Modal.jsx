@@ -21,7 +21,7 @@ const Modal = ({ isOpen, onClose, report, onUpdateReport }) => {
           <p><strong>Incident Date:</strong> {new Date(report.incidentDate).toLocaleDateString()}</p>
         </div>
         <button
-          onClick={() => onUpdateReport(report._id, 'IN_PROGRESS')}
+          onClick={() => onUpdateReport(report._id, 'PROGRESS')}
           className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors mr-2"
         >
           Mark as In Progress

@@ -9,17 +9,20 @@ import Navigation from "../Home/Navigation";
 import { RiSearch2Line } from "react-icons/ri";
 import { TbEyeSearch, TbReportOff, TbSend } from "react-icons/tb";
 import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
+import { HiMiniInboxArrowDown } from "react-icons/hi2";
+import { LuFilePlus2 } from "react-icons/lu";
 import { UserContext } from "../../UserContext";
+import { IoCalendarOutline } from "react-icons/io5";
 
 const ReportForm = ({ handleSubmit, users }) => {
   const [reports, setReports] = useState([]);
   const [selectedReport, setSelectedReport] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 6; 
+  const itemsPerPage = 6;
   const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState("all"); 
-  const {role} = useContext(UserContext)
+  const [dateFilter, setDateFilter] = useState("all");
+  const { role } = useContext(UserContext);
 
   useEffect(() => {
     const fetchReports = async () => {
@@ -161,7 +164,7 @@ const ReportForm = ({ handleSubmit, users }) => {
     switch (state) {
       case "PENDING":
         return "bg-yellow-100 text-yellow-800";
-      case "IN_PROGRESS":
+      case "PROGRESS":
         return "bg-blue-100 text-blue-800";
       case "COMPLETED":
         return "bg-green-100 text-green-800";
@@ -176,7 +179,7 @@ const ReportForm = ({ handleSubmit, users }) => {
 
   return (
     <>
-    <title>Reports</title>
+      <title>Reports</title>
 
       <Navigation />
       <div className="container mx-auto">
@@ -186,30 +189,36 @@ const ReportForm = ({ handleSubmit, users }) => {
               className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-3"
               onClick={handleExport}
             >
-              Exportar Reportes
+              <span className="flex gap-2">
+                <HiMiniInboxArrowDown className="text-xl " />
+                Export Report
+              </span>
             </button>
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+              className=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
               onClick={() => setShowModal(true)}
             >
-              + Crear Reporte
+              <span className="flex gap-2">
+                <LuFilePlus2 className="text-xl " /> New Report
+              </span>
             </button>
-            
           </div>
-          <div className="flex justify-center ">
-          <select
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-            className="bg-gray-200 outline-none py-2 px-4 rounded-xl"
-          >
-            <option value="all"> All</option>
-            <option value="last_day">Last Day</option>
-            <option value="last_7_days">Last 7 Days</option>
-            <option value="last_30_days">Last 30 Days</option>
-            <option value="last_month">Last Month</option>
-            <option value="last_year">Last Year</option>
-          </select>
-        </div>
+          <div className="flex justify-center  gap-2">
+          <IoCalendarOutline className="text-xl gap-2 mt-2" />
+            <select
+              className="form-select form-control w-fit bg-gray-200 outline-none  rounded-xl"
+              aria-label="Default select example"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+            >
+              <option value="all"> All</option>
+              <option value="last_day">Last Day</option>
+              <option value="last_7_days">Last 7 Days</option>
+              <option value="last_30_days">Last 30 Days</option>
+              <option value="last_month">Last Month</option>
+              <option value="last_year">Last Year</option>
+            </select>
+          </div>
           <div className="relative ml-auto ">
             <RiSearch2Line className="absolute top-1/2 -translate-y-1/2 left-2" />
             <input
@@ -220,10 +229,7 @@ const ReportForm = ({ handleSubmit, users }) => {
               placeholder="Search for username"
             />
           </div>
-          
         </div>
-
-       
 
         {showModal && (
           <CreateReport
@@ -233,7 +239,7 @@ const ReportForm = ({ handleSubmit, users }) => {
         )}
         <div>
           <h4 className="px-6 py-3 bg-gray-50 text-left text-xl leading-4 font-bold text-gray-500 uppercase tracking-wider rounded-md ">
-             {role === 'admin' ? ' Reports of all residents': "Your Reports"}
+            {role === "admin" ? " Reports of all residents" : "Your Reports"}
           </h4>
         </div>
         <div className="max-h-[450px] overflow-y-auto">
@@ -249,8 +255,7 @@ const ReportForm = ({ handleSubmit, users }) => {
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
               {filteredAndDateFilteredReports
-                // .slice()
-                .reverse() 
+                .reverse()
                 .slice(indexOfFirstItem, indexOfLastItem)
                 .map((report, index) => (
                   <tr
@@ -302,18 +307,27 @@ const ReportForm = ({ handleSubmit, users }) => {
                               See report
                             </button>
                           </li>
-                          <li><hr className="dropdown-divider" /></li>
                           <li>
-                            <button className="dropdown-item flex gap-2 text-red-500" type="button"
+                            <hr className="dropdown-divider" />
+                          </li>
+                          <li>
+                            <button
+                              className="dropdown-item flex gap-2 text-red-500"
+                              type="button"
                               onClick={() => handleDelete(report._id)}
                             >
                               <TbReportOff className="text-xl text-red-300" />
                               Delete
                             </button>
                           </li>
-                          <li><hr className="dropdown-divider" /></li>
                           <li>
-                            <button className="dropdown-item flex gap-2" type="button">
+                            <hr className="dropdown-divider" />
+                          </li>
+                          <li>
+                            <button
+                              className="dropdown-item flex gap-2"
+                              type="button"
+                            >
                               <TbSend className="text-xl" />
                               Send to
                             </button>
@@ -347,17 +361,23 @@ const ReportForm = ({ handleSubmit, users }) => {
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${currentPage === 1 ? "cursor-not-allowed" : ""
-                }`}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
+                currentPage === 1 ? "cursor-not-allowed" : ""
+              }`}
             >
-             <MdArrowBackIosNew /> {/* Flecha hacia la izquierda */}
+              <MdArrowBackIosNew /> {/* Flecha hacia la izquierda */}
             </button>
 
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={indexOfLastItem >= filteredAndDateFilteredReports.length}
-              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${indexOfLastItem >= filteredAndDateFilteredReports.length ? "cursor-not-allowed" : ""
-                }`}
+              disabled={
+                indexOfLastItem >= filteredAndDateFilteredReports.length
+              }
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
+                indexOfLastItem >= filteredAndDateFilteredReports.length
+                  ? "cursor-not-allowed"
+                  : ""
+              }`}
             >
               <MdArrowForwardIos /> {/* Flecha hacia la derecha */}
             </button>

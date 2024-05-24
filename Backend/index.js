@@ -44,21 +44,6 @@ app.use(
 const server = app.listen(4040);
 const io = socketIo(server);
 // WebSockets
-io.on("connection", (socket) => {
-  console.log("New client connected");
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-  });
-
-  socket.on("joinReport", (reportId) => {
-    socket.join(reportId);
-  });
-
-  socket.on("leaveReport", (reportId) => {
-    socket.leave(reportId);
-  });
-});
 
 
 
@@ -178,7 +163,6 @@ app.post("/logout", (req, res) => {
 const wss = new ws.WebSocketServer({ server });
 
 wss.on("connection", (socket) => {
-  console.log("Nuevo cliente conectado");
 
   socket.on("close", () => {
     console.log("Cliente desconectado");
@@ -217,7 +201,6 @@ wss.on("connection", (connection, req) => {
       clearInterval(connection.timer);
       connection.terminate();
       notifyAboutOnlinePeople();
-      console.log("dead");
     }, 1000);
   }, 5000);
 
@@ -266,7 +249,6 @@ wss.on("connection", (connection, req) => {
         text,
         file: file ? filename : null,
       });
-      console.log("created message");
       [...wss.clients]
         .filter((c) => c.userId === recipient)
         .forEach((c) =>
@@ -885,7 +867,7 @@ app.put("/user", uploads.single("profileImage"), async (req, res) => {
 app.post("/api/sendPasswordRecoveryEmail", async (req, res) => {
   const { email } = req.body;
 
-  // Define las opciones del correo electrónico
+  //  las opciones del correo electrónico
   const emailOptions = {
     from: "onboarding@resend.dev",
     to: email,

@@ -27,7 +27,7 @@ const reportSchema = new mongoose.Schema({
   },
   state: {
     type: String,
-    enum: ["PENDING", "IN_PROGRESS", "COMPLETED", "CLOSED", "REJECTED"],
+    enum: ["PENDING", "PROGRESS", "COMPLETED", "CLOSED", "REJECTED"],
     default: "PENDING",
   },
   image: {

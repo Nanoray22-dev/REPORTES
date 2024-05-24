@@ -125,7 +125,7 @@ function Dashboard({ username }) {
         (report) => report.state === "PENDING"
       ).length;
       const inProgressCount = reportsData.filter(
-        (report) => report.state === "IN_PROGRESS"
+        (report) => report.state === "PROGRESS"
       ).length;
       const completedReportsCount = reportsData.filter(
         (report) => report.state === "COMPLETED"
@@ -177,7 +177,7 @@ function Dashboard({ username }) {
     switch (state) {
       case "PENDING":
         return "bg-yellow-100 text-yellow-800";
-      case "IN_PROGRESS":
+      case "PROGRESS":
         return "bg-blue-100 text-blue-800";
       case "COMPLETED":
         return "bg-green-100 text-green-800";
@@ -252,9 +252,9 @@ function Dashboard({ username }) {
       }
     };
 
-    return () => {
-      socket.close();
-    };
+    // return () => {
+    //   socket.close();
+    // };
   }, [setNotifications]);
 
   function logout() {
@@ -295,6 +295,58 @@ function Dashboard({ username }) {
             className="h-full w-full bg-gray-50 relative overflow-y-auto lg:ml-64"
           >
             <main>
+              <div className="pt-2 px-4">
+                 <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                  <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
+                          {" "}
+                          {pendingReportsCount}
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          New reports peding
+                        </h3>
+                      </div>
+                      <div className="ml-5 w-0 flex items-center justify-end flex-1 text-yellow-500 text-base font-bold">
+                        Pending
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
+                          {inProgressReportsCount}
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          In progress{" "}
+                        </h3>
+                      </div>
+                      <div className="ml-5 w-0 flex items-center justify-end flex-1 text-blue-500 text-base font-bold">
+                        Progress
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
+                    <div className="flex items-center">
+                      <div className="flex-shrink-0">
+                        <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
+                          {" "}
+                          {completedReportsCount}
+                        </span>
+                        <h3 className="text-base font-normal text-gray-500">
+                          Report completed{" "}
+                        </h3>
+                      </div>
+                      <div className="ml-5 w-0 flex items-center justify-end flex-1 text-green-500 text-base font-bold">
+                        Completed
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+           
               <div className="pt-6 px-4">
                 <div className="w-full grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 2xl:col-span-2">
@@ -428,55 +480,6 @@ function Dashboard({ username }) {
                             </table>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                  <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
-                          {" "}
-                          {pendingReportsCount}
-                        </span>
-                        <h3 className="text-base font-normal text-gray-500">
-                          New reports peding
-                        </h3>
-                      </div>
-                      <div className="ml-5 w-0 flex items-center justify-end flex-1 text-yellow-500 text-base font-bold">
-                        Pending
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
-                          {inProgressReportsCount}
-                        </span>
-                        <h3 className="text-base font-normal text-gray-500">
-                          In progress{" "}
-                        </h3>
-                      </div>
-                      <div className="ml-5 w-0 flex items-center justify-end flex-1 text-blue-500 text-base font-bold">
-                        Progress
-                      </div>
-                    </div>
-                  </div>
-                  <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="text-2xl sm:text-3xl leading-none font-bold text-gray-900">
-                          {" "}
-                          {completedReportsCount}
-                        </span>
-                        <h3 className="text-base font-normal text-gray-500">
-                          Report completed{" "}
-                        </h3>
-                      </div>
-                      <div className="ml-5 w-0 flex items-center justify-end flex-1 text-green-500 text-base font-bold">
-                        Completed
                       </div>
                     </div>
                   </div>

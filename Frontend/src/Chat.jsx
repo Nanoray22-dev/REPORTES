@@ -38,7 +38,6 @@ export default function Chat() {
   }
   function handleMessage(ev) {
     const messageData = JSON.parse(ev.data);
-    console.log({ ev, messageData });
     if ("online" in messageData) {
       showOnlinePeople(messageData.online);
     } else if ("text" in messageData) {
@@ -47,13 +46,6 @@ export default function Chat() {
       }
     }
   }
-  // function logout() {
-  //   axios.post("/logout").then(() => {
-  //     setWs(null);
-  //     setId(null);
-  //     setUsername(null);
-  //   });
-  // }
   function sendMessage(ev, file = null) {
     if (ev) ev.preventDefault();
     ws.send(
@@ -140,7 +132,6 @@ export default function Chat() {
                 username={onlinePeopleExclOurUser[userId]}
                 onClick={() => {
                   setSelectedUserId(userId);
-                  console.log({ userId });
                 }}
                 selected={userId === selectedUserId}
               />
