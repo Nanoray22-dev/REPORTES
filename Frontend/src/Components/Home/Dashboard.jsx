@@ -24,7 +24,6 @@ function Dashboard({ username }) {
   const [completedReportsCount, setCompletedReportsCount] = useState(0);
   const [totalReportsCount, setTotalReportsCount] = useState(0);
   const [reports, setReports] = useState([]);
-  const [notifications, setNotifications] = useState([]);
   const [users, setUsers] = useState([]);
   const [totalUsersCount, setTotalUsersCount] = useState(0);
   const [usersByMonth, setUsersByMonth] = useState({});
@@ -34,7 +33,8 @@ function Dashboard({ username }) {
   const [reportsByDay, setReportsByDay] = useState({});
   const [reportsByWeek, setReportsByWeek] = useState({});
   const [filter, setFilter] = useState("month");
-
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([]);
   const getRandomProfileImage = () => {
     const randomId = Math.floor(Math.random() * 100) + 1;
     return `https://randomuser.me/api/portraits/thumb/men/${randomId}.jpg`;
@@ -115,7 +115,7 @@ function Dashboard({ username }) {
       setInProgressReportsCount(inProgressCount);
       setCompletedReportsCount(completedReportsCount);
       setTotalReportsCount(reportsData.length);
-
+      updateChartData();
       const reportsByDayData = reportsData.reduce((acc, report) => {
         const day = moment(report.incidentDate).format("YYYY-MM-DD");
         if (!acc[day]) acc[day] = 0;
@@ -151,6 +151,7 @@ function Dashboard({ username }) {
       return updatedReports.slice(-8);
     });
   };
+  const updateChartData = () => {};
 
   const getsColorState = (state) => {
     switch (state) {
@@ -204,12 +205,37 @@ function Dashboard({ username }) {
       },
     ],
   };
- 
 
   useEffect(() => {
-    fetchReports();
     fetchUsers();
-  }, []);
+    fetchReports();
+    const socket = new WebSocket("ws://localhost:4040");
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "new-report") {
+        setNotifications((prevNotifications) => [
+          ...prevNotifications,
+          message.data,
+        ]);
+        fetchReports();
+      } else if (message.type === "delete-report") {
+        setReports((prevReports) =>
+          prevReports.filter((report) => report._id === message.reportId)
+        );
+        fetchReports();
+      } else if (message.type === "update-report") {
+        setReports((prevReports) =>
+          prevReports.filter((report) => report._id === message.reportId)
+        );
+        fetchReports();
+      }
+    };
+
+    return () => {
+      socket.close();
+    };
+  }, [setNotifications]);
 
   function logout() {
     axios.post("/logout").then(() => {
@@ -222,9 +248,23 @@ function Dashboard({ username }) {
   return (
     <>
       <div>
-       <Header username={username} MdOutlineContactMail={MdOutlineContactMail} CgDarkMode={CgDarkMode} Link={Link} RiLogoutBoxRLine={RiLogoutBoxRLine} logout={logout} />
+        <Header
+          username={username}
+          MdOutlineContactMail={MdOutlineContactMail}
+          CgDarkMode={CgDarkMode}
+          Link={Link}
+          RiLogoutBoxRLine={RiLogoutBoxRLine}
+          logout={logout}
+          setShowNotifications={setShowNotifications}
+          showNotifications={showNotifications}
+          notifications={notifications}
+        />
         <div className="flex overflow-hidden bg-white pt-16">
-         <Sidebar MdOutlinePayments={MdOutlinePayments} Link={Link} MdOutlineContactSupport={MdOutlineContactSupport}/>
+          <Sidebar
+            MdOutlinePayments={MdOutlinePayments}
+            Link={Link}
+            MdOutlineContactSupport={MdOutlineContactSupport}
+          />
           <div
             className="bg-gray-900 opacity-50 hidden fixed inset-0 z-10"
             id="sidebarBackdrop"
@@ -266,7 +306,7 @@ function Dashboard({ username }) {
                       <select
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
-                        className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+                        className="block w-fit pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md form-control uppercase "
                       >
                         <option value="day">Day</option>
                         <option value="week">Week</option>
@@ -335,7 +375,7 @@ function Dashboard({ username }) {
                                 </tr>
                               </thead>
                               <tbody className="bg-white">
-                                {reports.map((report, index) => (
+                                {reports.reverse().map((report, index) => (
                                   <tr
                                     key={index}
                                     className={
@@ -747,7 +787,6 @@ function Dashboard({ username }) {
               <a href="#" className="hover:underline" target="_blank">
                 NanorayDev
               </a>
-
             </p>
           </div>
         </div>

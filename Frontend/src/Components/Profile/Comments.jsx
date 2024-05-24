@@ -22,40 +22,31 @@ const Comments = ({ reportId }) => {
         console.error("Error fetching comments", error);
       }
     };
+    fetchComments();
+    fetchCurrentUser();
+    const socket = new WebSocket("ws://localhost:4040");
 
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await axios.get('/user/me'); 
-        setCurrentUser(response.data);
-      } catch (error) {
-        console.error("Error fetching current user", error);
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "new-comment" && message.comment.report === reportId) {
+        setComments((prevComments) =>
+          prevComments.filter((comments) => comments._id === message.commentsId)
+        );
+        fetchComments();
       }
     };
 
-    fetchComments();
-    fetchCurrentUser();
-
-    socket.emit('joinReport', reportId);
-
-    socket.on('newComment', (comment) => {
-      setComments((prevComments) => [...prevComments, comment]);
-    });
-
-    socket.on('updateComment', (updatedComment) => {
-      setComments((prevComments) =>
-        prevComments.map((comment) => comment._id === updatedComment._id ? updatedComment : comment)
-      );
-    });
-
-    socket.on('deleteComment', (commentId) => {
-      setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
-    });
-
-    return () => {
-      socket.emit('leaveReport', reportId);
-      socket.disconnect();
-    };
+    
   }, [reportId]);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const response = await axios.get('/user/me'); 
+      setCurrentUser(response.data);
+    } catch (error) {
+      console.error("Error fetching current user", error);
+    }
+  };
 
   const handleAddComment = async () => {
     try {

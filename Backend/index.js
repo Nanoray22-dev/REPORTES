@@ -60,6 +60,8 @@ io.on("connection", (socket) => {
   });
 });
 
+
+
 async function getUserDataFromRequest(req) {
   return new Promise((resolve, reject) => {
     const token = req.cookies?.token;
@@ -174,6 +176,24 @@ app.post("/logout", (req, res) => {
 });
 
 const wss = new ws.WebSocketServer({ server });
+
+wss.on("connection", (socket) => {
+  console.log("Nuevo cliente conectado");
+
+  socket.on("close", () => {
+    console.log("Cliente desconectado");
+  });
+});
+
+const notifyAllClients = (message) => {
+  wss.clients.forEach((client) => {
+    if (client.readyState === ws.OPEN) {
+      client.send(JSON.stringify(message));
+    }
+  });
+};
+
+
 wss.on("connection", (connection, req) => {
   function notifyAboutOnlinePeople() {
     [...wss.clients].forEach((client) => {
@@ -399,7 +419,7 @@ app.post("/report", upload.single("image"), async (req, res) => {
       image: imagePath ? `${baseUrl}${imagePath}` : null,
     };
 
-    io.emit("new-report", reportWithDetails);
+    notifyAllClients({ type: "new-report", data: reportWithDetails });
 
     res.status(201).json(reportWithDetails);
   } catch (error) {
@@ -415,7 +435,7 @@ app.delete("/report/:id", async (req, res) => {
   try {
     const reportId = req.params.id;
     await Report.findByIdAndDelete(reportId);
-    io.emit("delete-report", reportId);
+    notifyAllClients({ type: "delete-report", reportId});
     res.status(200).json({ message: "Report deleted successfully" });
   } catch (error) {
     console.error("Error deleting report:", error);
@@ -454,7 +474,8 @@ app.put("/report/:id", async (req, res) => {
       image: updatedReport.image ? `${baseUrl}${updatedReport.image}` : null,
     };
 
-    io.emit("update-report", reportWithDetails);
+    notifyAllClients({ type: "update-report", reportWithDetails});
+
 
     res.status(200).json(reportWithDetails);
   } catch (error) {
@@ -530,7 +551,7 @@ app.post("/report/:id/comment", async (req, res) => {
     const newComment = report.comments[report.comments.length - 1];
     newComment.createdBy = user;
 
-    io.to(reportId).emit("newComment", newComment);
+    notifyAllClients({ type: "new-comment", data: { reportId, comment: newComment } });
 
     res.status(201).json(newComment);
   } catch (error) {

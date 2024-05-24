@@ -248,7 +248,7 @@ const ReportForm = ({ handleSubmit }) => {
             </thead>
             <tbody className="text-gray-600 text-sm font-light">
               {filteredAndDateFilteredReports
-                .slice()
+                // .slice()
                 .reverse() 
                 .slice(indexOfFirstItem, indexOfLastItem)
                 .map((report, index) => (

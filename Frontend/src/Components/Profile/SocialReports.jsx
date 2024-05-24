@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import Comments from "./Comments";
 import Navigation from "../Home/Navigation";
-import { Spinner } from "@chakra-ui/react"; 
-import logo from '/logo.png';
+import { Spinner } from "@chakra-ui/react";
+import logo from "/logo.png";
 const SocialReports = () => {
   const [reports, setReports] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,23 +12,32 @@ const SocialReports = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const response = await axios.get("/reports");
-        const sortedReports = response.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    fetchReports();
+    const socket = new WebSocket("ws://localhost:4040");
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      if (message.type === "new-report") {
+        setReports((prevReports) =>
+          prevReports.filter((report) => report._id === message.reportId)
         );
-        setReports(sortedReports);
-      } catch (error) {
-        setError("Error fetching reports. Please try again later.");
-      } finally {
-        setLoading(false);
+        fetchReports();
       }
     };
-
-    fetchReports();
   }, []);
-
+  const fetchReports = async () => {
+    try {
+      const response = await axios.get("/reports");
+      const sortedReports = response.data.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+      setReports(sortedReports);
+    } catch (error) {
+      setError("Error fetching reports. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
   const filteredReports = reports.filter((report) => {
     const title = report.title?.toLowerCase() || "";
     const description = report.description?.toLowerCase() || "";
@@ -46,9 +55,14 @@ const SocialReports = () => {
       <Navigation />
       <div className="container mx-auto p-4 max-w-3xl">
         <div className="flex">
-        <img src={logo} alt="Logo" className="h-24 w-24 mr-2 mb-4 rounded-full" />
-        <h1 className="text-3xl font-bold mb-4 my-auto text-gray-800">Social Reports</h1>
-
+          <img
+            src={logo}
+            alt="Logo"
+            className="h-24 w-24 mr-2 mb-4 rounded-full"
+          />
+          <h1 className="text-3xl font-bold mb-4 my-auto text-gray-800">
+            Social Reports
+          </h1>
         </div>
         <div className="mb-4">
           <input
