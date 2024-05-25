@@ -251,10 +251,7 @@ function Dashboard({ username }) {
         fetchReports();
       }
     };
-
-    // return () => {
-    //   socket.close();
-    // };
+    
   }, [setNotifications]);
 
   function logout() {

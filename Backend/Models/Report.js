@@ -55,5 +55,6 @@ const reportSchema = new mongoose.Schema({
   comments: [commentSchema],
 });
 
-const Report = mongoose.model("Report", reportSchema);
+
+const Report = mongoose.models.Report || mongoose.model("Report", reportSchema);
 module.exports = Report;

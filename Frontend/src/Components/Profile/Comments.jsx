@@ -4,7 +4,6 @@ import moment from 'moment';
 import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
 
-
 const Comments = ({ reportId }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
@@ -21,31 +20,67 @@ const Comments = ({ reportId }) => {
         console.error("Error fetching comments", error);
       }
     };
-    fetchComments();
-    fetchCurrentUser();
-    const socket = new WebSocket("ws://localhost:4040");
 
-    socket.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === "new-comment" && message.comment.report === reportId) {
-        setComments((prevComments) =>
-          prevComments.filter((comments) => comments._id === message.commentsId)
-        );
-        fetchComments();
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await axios.get('/user/me'); 
+        setCurrentUser(response.data);
+      } catch (error) {
+        console.error("Error fetching current user", error);
       }
     };
 
-    
-  }, [reportId]);
+    fetchComments();
+    fetchCurrentUser();
 
-  const fetchCurrentUser = async () => {
-    try {
-      const response = await axios.get('/user/me'); 
-      setCurrentUser(response.data);
-    } catch (error) {
-      console.error("Error fetching current user", error);
-    }
-  };
+    let socket;
+    // let reconnectAttempts = 0;
+    // const maxReconnectAttempts = 10;
+
+    const connectWebSocket = () => {
+      socket = new WebSocket("ws://localhost:4040");
+
+      // socket.onopen = () => {
+      //   console.log("WebSocket connection established");
+      //   reconnectAttempts = 0;
+      // };
+
+      socket.onmessage = (event) => {
+        try {
+          const message = JSON.parse(event.data);
+          if (message.type === "new-comment" && message.comment && message.comment.report === reportId) {
+            setComments((prevComments) => 
+              prevComments.filter((comment) => comment._id === message.comment._id)
+            );
+            fetchComments();
+          }
+        } catch (error) {
+          console.error("Error processing WebSocket message", error);
+        }
+      };
+
+      // socket.onerror = (error) => {
+      //   console.error("WebSocket error", error);
+      // };
+
+      // socket.onclose = (event) => {
+      //   console.log("WebSocket closed", event);
+      //   if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) { 
+      //     console.error(`WebSocket closed unexpectedly with code: ${event.code}. Reconnecting...`);
+      //     reconnectAttempts++;
+      //     setTimeout(connectWebSocket, Math.min(10000, 1000 * reconnectAttempts));
+      //   } else {
+      //     console.error("Max reconnect attempts reached. Unable to reconnect to WebSocket.");
+      //   }
+      // };
+    };
+
+    connectWebSocket();
+
+    return () => {
+      socket.close();
+    };
+  }, [reportId]);
 
   const handleAddComment = async () => {
     try {
