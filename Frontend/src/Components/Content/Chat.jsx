@@ -1,10 +1,10 @@
 import { useContext, useEffect, useRef, useState } from "react";
-import Logo from "./Logo";
-import { UserContext } from "./UserContext.jsx";
+import Logo from "./Logo.jsx";
+import { UserContext } from "../../UserContext.jsx";
 import { uniqBy } from "lodash";
 import axios from "axios";
-import Contact from "./Contact";
-import Navigation from "./Components/Home/Navigation.jsx";
+import Contact from "./Contact.jsx";
+import Navigation from "../Home/Navigation.jsx";
 
 export default function Chat() {
   const [ws, setWs] = useState(null);

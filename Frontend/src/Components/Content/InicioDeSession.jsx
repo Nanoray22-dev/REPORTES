@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import axios from "axios";
-import { UserContext } from "./UserContext.jsx";
+import { UserContext } from "../../UserContext.jsx";
 import logo from "/logo.png";
-import PreLoader from "./Components/Helpers/PreLoader.jsx";
+import PreLoader from "../Helpers/PreLoader.jsx";
 import { useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
 

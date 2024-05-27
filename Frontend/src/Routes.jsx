@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import InicioDeSession from "./InicioDeSession";
 import { UserContext } from "./UserContext";
-import Chat from "./Chat";
+import { Routes, Route, Navigate } from "react-router-dom";
+import InicioDeSession from "./Components/Content/InicioDeSession";
+import Chat from "./Components/Content/Chat";
 import Dashboard from "./Components/Home/Dashboard";
 import ReportForm from "./Components/Report/ReportForm";
 import UserTable from "./Components/Profile/UserTable";

@@ -2,7 +2,7 @@ import axios from "axios";
 import {UserContext, UserContextProvider} from "./UserContext";
 import Routes from "./Routes";
 import { BrowserRouter  } from 'react-router-dom';
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 

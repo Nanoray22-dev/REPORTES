@@ -124,7 +124,7 @@ const Sidebar = ({ MdOutlinePayments, Link, MdOutlineContactSupport }) => {
                       ></path>
                     </svg>
                     <span className="ml-3 flex-1 whitespace-nowrap">
-                      Sign Up
+                      Finance
                     </span>
                   </a>
                 </li>

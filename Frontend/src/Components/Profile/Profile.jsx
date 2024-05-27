@@ -170,8 +170,6 @@ function Profile({  setIsLoggedIn }) {
                   src={
                     avatar
                       ? URL.createObjectURL(avatar)
-                      : user.profileImage
-                      ? user.profileImage
                       : "http://ssl.gstatic.com/accounts/ui/avatar_2x.png"
                   }
                   className="w-32 h-32 mx-auto rounded-full mb-4"

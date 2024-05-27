@@ -251,7 +251,6 @@ function Dashboard({ username }) {
         fetchReports();
       }
     };
-    
   }, [setNotifications]);
 
   function logout() {
@@ -264,7 +263,7 @@ function Dashboard({ username }) {
   }
   return (
     <>
-    <title>Dashboard</title>
+      <title>Dashboard</title>
       <div>
         <Header
           username={username}
@@ -293,7 +292,7 @@ function Dashboard({ username }) {
           >
             <main>
               <div className="pt-2 px-4">
-                 <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                <div className="mt-4 w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 ">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
@@ -343,7 +342,7 @@ function Dashboard({ username }) {
                   </div>
                 </div>
               </div>
-           
+
               <div className="pt-6 px-4">
                 <div className="w-full grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-4">
                   <div className="bg-white shadow rounded-lg p-4 sm:p-6 xl:p-8 2xl:col-span-2">
@@ -502,7 +501,7 @@ function Dashboard({ username }) {
                               <div className="flex-shrink-0">
                                 <img
                                   className="h-8 w-8 rounded-full"
-                                  src={user.profileImage}
+                                  src={"http://ssl.gstatic.com/accounts/ui/avatar_2x.png"}
                                   alt="User avatar"
                                 />
                               </div>
