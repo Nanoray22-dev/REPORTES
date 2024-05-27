@@ -119,10 +119,10 @@ app.post("/login", async (req, res) => {
         }
       );
     } else {
-      res.status(401).json({ message: "Credenciales incorrectas" });
+      res.status(401).json({ message: "Credencials incorrect" });
     }
   } else {
-    res.status(404).json({ message: "Usuario no encontrado" });
+    res.status(404).json({ message: "User no found" });
   }
 });
 
@@ -140,7 +140,7 @@ app.post("/register", async (req, res) => {
       {},
       (err, token) => {
         if (err) {
-          res.status(500).json({ message: "Error en la generación del token" });
+          res.status(500).json({ message: "Token Error" });
         } else {
           res
             .cookie("token", token, { sameSite: "none", secure: true })
@@ -152,7 +152,7 @@ app.post("/register", async (req, res) => {
       }
     );
   } catch (err) {
-    res.status(500).json({ message: "Error al registrar el usuario" });
+    res.status(500).json({ message: "Error to register the user" });
   }
 });
 
@@ -484,7 +484,7 @@ app.post("/assign-report/:reportId", async (req, res) => {
   }
 });
 
-//  Seguimiento del estado del informe: Marcar un informe como revisado
+
 app.put("/mark-report-reviewed/:reportId", async (req, res) => {
   try {
     const reportId = req.params.reportId;

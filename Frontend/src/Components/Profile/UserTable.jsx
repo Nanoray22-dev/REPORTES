@@ -166,7 +166,7 @@ const UserTable = () => {
             </thead>
 
             <tbody>
-              {filteredUsers.map((user) => (
+              {filteredUsers.reverse().map((user) => (
                 <tr
                   key={user._id}
                   className="border-t border-gray-200 hover:bg-gray-300"
@@ -177,13 +177,13 @@ const UserTable = () => {
                     </td>
                   )}
                   {selectedColumns.includes("email") && (
-                    <td className="px-6 py-4 whitespace-no-wrap">{user.email}</td>
+                    <td className="px-6 py-4 whitespace-no-wrap">{user.email ? user.email: "No Email"}</td>
                   )}
                   {selectedColumns.includes("address") && (
-                    <td className="px-6 py-4 whitespace-no-wrap">{user.address}</td>
+                    <td className="px-6 py-4 whitespace-no-wrap">{user.address ? user.address : "No address" }</td>
                   )}
                   {selectedColumns.includes("phone") && (
-                    <td className="px-6 py-4 whitespace-no-wrap">{user.phone}</td>
+                    <td className="px-6 py-4 whitespace-no-wrap">{user.phone ? user.phone : "No Phone"}</td>
                   )}
                   {selectedColumns.includes("age") && (
                     <td className="px-6 py-4 whitespace-no-wrap">{user.age}</td>
