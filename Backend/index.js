@@ -41,7 +41,7 @@ app.use(
   })
 );
 
-const server = app.listen(4040);
+const server = app.listen(process.env.PORT);
 const io = socketIo(server);
 
 
@@ -61,7 +61,7 @@ async function getUserDataFromRequest(req) {
   });
 }
 
-app.get("/test", (req, res) => {
+app.get("/", (req, res) => {
   res.json("test ok");
 });
 

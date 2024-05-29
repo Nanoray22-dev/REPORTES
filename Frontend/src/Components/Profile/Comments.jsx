@@ -14,7 +14,7 @@ const Comments = ({ reportId }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const response = await axios.get(`/report/${reportId}/comments`);
+        const response = await axios.get(`https://backoasis-production.up.railway.app/report/${reportId}/comments`);
         setComments(response.data);
       } catch (error) {
         console.error("Error fetching comments", error);
@@ -38,7 +38,7 @@ const Comments = ({ reportId }) => {
     // const maxReconnectAttempts = 10;
 
     const connectWebSocket = () => {
-      socket = new WebSocket("ws://localhost:4040");
+      socket = new WebSocket("ws://backoasis-production.up.railway.app");
 
       // socket.onopen = () => {
       //   console.log("WebSocket connection established");
@@ -58,21 +58,7 @@ const Comments = ({ reportId }) => {
           console.error("Error processing WebSocket message", error);
         }
       };
-
-      // socket.onerror = (error) => {
-      //   console.error("WebSocket error", error);
-      // };
-
-      // socket.onclose = (event) => {
-      //   console.log("WebSocket closed", event);
-      //   if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) { 
-      //     console.error(`WebSocket closed unexpectedly with code: ${event.code}. Reconnecting...`);
-      //     reconnectAttempts++;
-      //     setTimeout(connectWebSocket, Math.min(10000, 1000 * reconnectAttempts));
-      //   } else {
-      //     console.error("Max reconnect attempts reached. Unable to reconnect to WebSocket.");
-      //   }
-      // };
+     
     };
 
     connectWebSocket();
@@ -84,7 +70,7 @@ const Comments = ({ reportId }) => {
 
   const handleAddComment = async () => {
     try {
-      const response = await axios.post(`/report/${reportId}/comment`, { text: newComment });
+      const response = await axios.post(`https://backoasis-production.up.railway.app/report/${reportId}/comment`, { text: newComment });
       setComments((prevComments) => [...prevComments, response.data]);
       setNewComment('');
     } catch (error) {
@@ -94,7 +80,7 @@ const Comments = ({ reportId }) => {
 
   const handleEditComment = async (commentId) => {
     try {
-      const response = await axios.put(`/report/${reportId}/comment/${commentId}`, { text: editingText });
+      const response = await axios.put(`https://backoasis-production.up.railway.app/report/${reportId}/comment/${commentId}`, { text: editingText });
       setComments((prevComments) => 
         prevComments.map((comment) => comment._id === commentId ? response.data : comment)
       );
@@ -107,7 +93,7 @@ const Comments = ({ reportId }) => {
 
   const handleDeleteComment = async (commentId) => {
     try {
-      await axios.delete(`/report/${reportId}/comment/${commentId}`);
+      await axios.delete(`https://backoasis-production.up.railway.app/report/${reportId}/comment/${commentId}`);
       setComments((prevComments) => prevComments.filter((comment) => comment._id !== commentId));
     } catch (error) {
       console.error("Error deleting comment", error);

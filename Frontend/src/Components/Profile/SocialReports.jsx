@@ -14,7 +14,7 @@ const SocialReports = ({avatar}) => {
 
   useEffect(() => {
     fetchReports();
-    const socket = new WebSocket("ws://localhost:4040");
+    const socket = new WebSocket("ws://backoasis-production.up.railway.app");
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
@@ -45,7 +45,7 @@ const SocialReports = ({avatar}) => {
 
   const fetchReports = async () => {
     try {
-      const response = await axios.get("/reports");
+      const response = await axios.get("https://backoasis-production.up.railway.app/reports");
       const sortedReports = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );

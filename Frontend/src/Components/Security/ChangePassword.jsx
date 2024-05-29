@@ -27,7 +27,7 @@ function ChangePassword() {
     e.preventDefault();
 
     try {
-      const response = await axios.post("/api/sendPasswordRecoveryEmail", {
+      const response = await axios.post("https://backoasis-production.up.railway.app/api/sendPasswordRecoveryEmail", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -52,7 +52,7 @@ function ChangePassword() {
     }
 
     try {
-      const response = await axios.post("/change-password", {
+      const response = await axios.post("https://backoasis-production.up.railway.app/change-password", {
         currentPassword,
         newPassword,
       });

@@ -37,7 +37,7 @@ function Profile({  setIsLoggedIn }) {
   const fetchUserData = async () => {
     try {
       const token = localStorage.getItem("token"); // Obtener el token de localStorage o de donde lo almacenes
-      const response = await axios.get("/user", {
+      const response = await axios.get("https://backoasis-production.up.railway.app/user", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -58,7 +58,7 @@ function Profile({  setIsLoggedIn }) {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.put(`/users/${user._id}`, user, {
+      await axios.put(`https://backoasis-production.up.railway.app/users/${user._id}`, user, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

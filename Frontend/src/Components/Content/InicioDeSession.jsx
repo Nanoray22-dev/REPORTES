@@ -16,12 +16,15 @@ export default function RegisterAndLoginForm({notification}) {
   const [passwordError, setPasswordError] = useState(false);
   const navigate = useNavigate();
 
+  const api = axios.create({
+    baseURL : import.meta.env.VITE_API
+  })
   async function handleSubmit(ev) {
     ev.preventDefault();
     setIsLoading(true);
     const url = isLoginOrRegister === "register" ? "register" : "login";
     try {
-      const { data } = await axios.post(url, { username, password });
+      const { data } = await api.post(url, { username, password });
       setLoggedInUsername(username);
       setId(data.id);
       setRole(data.role);
@@ -99,7 +102,7 @@ export default function RegisterAndLoginForm({notification}) {
               <div className="flex items-center h-full px-20 bg-gray-900 bg-opacity-60">
               <div>
                 <h2 className="text-6xl font-extrabold text-white">
-                  Fix<span className="text-orange-400">Oais</span>
+                  Fix<span className="text-orange-400">Oasis</span>
                 </h2>
                 <p className="text-white ml-3 font-medium text-xm">
                 Turn your voice into action! 
@@ -119,7 +122,7 @@ export default function RegisterAndLoginForm({notification}) {
                 <img
                   src={logo}
                   alt="Logo"
-                  className="h-24 w-24 ml-36 mb-4 rounded-full"
+                  className="h-24 w-24 lg:ml-36 ml-32 md:ml-20  xs:ml-20 mb-4 rounded-full"
                 />
                 <h2 className="text-3xl font-semibold mb-2 text-white">
                   {isLoginOrRegister === "register" ? "Register" : "Login"}

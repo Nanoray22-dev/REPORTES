@@ -10,7 +10,7 @@ export function UserContextProvider({ children }) {
   
 
   useEffect(() => {
-    axios.get('/profile').then(response => {
+    axios.get('https://backoasis-production.up.railway.app/profile').then(response => {
       setId(response.data.userId);
       setUsername(response.data.username);
       setRole(response.data.role); 

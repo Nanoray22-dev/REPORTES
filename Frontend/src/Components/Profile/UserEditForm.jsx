@@ -12,7 +12,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
         if (!userId) {
           return;
         }
-        const response = await axios.get(`/users/${userId}`);
+        const response = await axios.get(`https://backoasis-production.up.railway.app/users/${userId}`);
         setUser(response.data);
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -29,7 +29,7 @@ const EditUserForm = ({ userId, closeModal, onUserUpdated }) => {
     event.preventDefault();
 
     try {
-      const response = await axios.put(`/users/${userId}`, user);
+      const response = await axios.put(`https://backoasis-production.up.railway.app/users/${userId}`, user);
       setUser(response.data);
       notifySuccess();
       onUserUpdated(response.data);

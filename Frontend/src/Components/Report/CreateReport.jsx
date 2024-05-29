@@ -19,7 +19,7 @@ const CreateReport = ({ onSubmit, onCloseModal }) => {
       formData.append("image", image);
       formData.append("incidentDate", incidentDate);
 
-      const response = await axios.post("/report", formData, {
+      const response = await axios.post("https://backoasis-production.up.railway.app/report", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

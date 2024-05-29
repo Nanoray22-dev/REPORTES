@@ -7,7 +7,7 @@ import '@mantine/core/styles.css';
 import { MantineProvider } from '@mantine/core';
 
 function App() {
-  axios.defaults.baseURL = 'http://localhost:4040';
+  axios.defaults.baseURL = 'https://backoasis-production.up.railway.app/';
   axios.defaults.withCredentials = true;
 const {setUsername} = useContext(UserContext)
   return (

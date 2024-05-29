@@ -74,7 +74,7 @@ function Dashboard({ username }) {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("/users");
+      const response = await axios.get("https://backoasis-production.up.railway.app/users");
       const usersData = response.data;
       setTotalUsersCount(usersData.length);
 
@@ -116,7 +116,7 @@ function Dashboard({ username }) {
 
   const fetchReports = async () => {
     try {
-      const response = await axios.get("/report");
+      const response = await axios.get("https://backoasis-production.up.railway.app/report");
       const reportsData = response.data;
       setReports(reportsData);
       updateReports(reportsData);
@@ -229,7 +229,7 @@ function Dashboard({ username }) {
   useEffect(() => {
     fetchUsers();
     fetchReports();
-    const socket = new WebSocket("ws://localhost:4040");
+    const socket = new WebSocket("ws://backoasis-production.up.railway.app");
 
     socket.onmessage = (event) => {
       const message = JSON.parse(event.data);
@@ -254,7 +254,7 @@ function Dashboard({ username }) {
   }, [setNotifications]);
 
   function logout() {
-    axios.post("/logout").then(() => {
+    axios.post("https://backoasis-production.up.railway.app/logout").then(() => {
       setWs(null);
       setId(null);
       setUsername(null);
