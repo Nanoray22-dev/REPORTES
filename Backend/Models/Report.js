@@ -31,7 +31,7 @@ const reportSchema = new mongoose.Schema({
     default: "PENDING",
   },
   image: {
-    type: String,
+    type: [String],
     required: false,
   },
   incidentDate: {

@@ -37,6 +37,16 @@ const ReportForm = ({ handleSubmit, users }) => {
     fetchReports();
   }, []);
 
+
+  const loadReports = async () => {
+    try {
+      const response = await axios.get("https://backoasis-production.up.railway.app/report");
+      setReports(response.data);
+    } catch (error) {
+      console.error("Error fetching reports:", error);
+    }
+  };
+
   const handleDelete = async (reportId) => {
     const confirmDelete = await Swal.fire({
       title: "¿Estás seguro?",
@@ -177,234 +187,244 @@ const ReportForm = ({ handleSubmit, users }) => {
     }
   };
 
+  const handleReportCreated = async (newReport) => {
+    try {
+      await axios.post("https://backoasis-production.up.railway.app/report", newReport);
+      setShowModal(false);
+      await loadReports(); 
+    } catch (error) {
+      console.error("Error creating report:", error);
+      Swal.fire("Error", "Ha ocurrido un error al crear el reporte", "error");
+    }
+  };
+
   return (
     <>
-    <title>Reports</title>
-  
-    <Navigation />
-    <div className="container mx-auto px-4">
-      <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
-            onClick={handleExport}
-          >
-            <span className="flex gap-2">
-              <HiMiniInboxArrowDown className="text-xl" />
-              Export Report
-            </span>
-          </button>
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-            onClick={() => setShowModal(true)}
-          >
-            <span className="flex gap-2">
-              <LuFilePlus2 className="text-xl" /> New Report
-            </span>
-          </button>
+      <title>Reports</title>
+
+      <Navigation />
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-center justify-between p-4 gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+              onClick={handleExport}
+            >
+              <span className="flex gap-2">
+                <HiMiniInboxArrowDown className="text-xl" />
+                Export Report
+              </span>
+            </button>
+            <button
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+              onClick={() => setShowModal(true)}
+            >
+              <span className="flex gap-2">
+                <LuFilePlus2 className="text-xl" /> New Report
+              </span>
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <IoCalendarOutline className="text-xl mt-2 md:mt-0" />
+            <select
+              className="form-select form-control w-full md:w-auto bg-gray-200 outline-none rounded-xl"
+              aria-label="Default select example"
+              value={dateFilter}
+              onChange={(e) => setDateFilter(e.target.value)}
+            >
+              <option value="all">All</option>
+              <option value="last_day">Last Day</option>
+              <option value="last_7_days">Last 7 Days</option>
+              <option value="last_30_days">Last 30 Days</option>
+              <option value="last_month">Last Month</option>
+              <option value="last_year">Last Year</option>
+            </select>
+          </div>
+          <div className="relative w-full md:w-auto">
+            <RiSearch2Line className="absolute top-1/2 transform -translate-y-1/2 left-2" />
+            <input
+              value={searchTerm}
+              onChange={handleSearchChange}
+              type="text"
+              className="bg-gray-200 outline-none py-2 pl-8 pr-4 rounded-xl w-full"
+              placeholder="Search for username"
+            />
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <IoCalendarOutline className="text-xl mt-2 md:mt-0" />
-          <select
-            className="form-select form-control w-full md:w-auto bg-gray-200 outline-none rounded-xl"
-            aria-label="Default select example"
-            value={dateFilter}
-            onChange={(e) => setDateFilter(e.target.value)}
-          >
-            <option value="all">All</option>
-            <option value="last_day">Last Day</option>
-            <option value="last_7_days">Last 7 Days</option>
-            <option value="last_30_days">Last 30 Days</option>
-            <option value="last_month">Last Month</option>
-            <option value="last_year">Last Year</option>
-          </select>
-        </div>
-        <div className="relative w-full md:w-auto">
-          <RiSearch2Line className="absolute top-1/2 transform -translate-y-1/2 left-2" />
-          <input
-            value={searchTerm}
-            onChange={handleSearchChange}
-            type="text"
-            className="bg-gray-200 outline-none py-2 pl-8 pr-4 rounded-xl w-full"
-            placeholder="Search for username"
+
+        {showModal && (
+          <CreateReport
+            onSubmit={handleSubmit}
+            onCloseModal={handleCloseModal}
+            onReportCreated={handleReportCreated}
           />
+        )}
+        <div>
+          <h4 className="px-6 py-3 bg-gray-50 text-left text-xl leading-4 font-bold text-gray-500 uppercase tracking-wider rounded-md">
+            {role === "admin" ? "Reports of all residents" : "Your Reports"}
+          </h4>
         </div>
-      </div>
-  
-      {showModal && (
-        <CreateReport
-          onSubmit={handleSubmit}
-          onCloseModal={handleCloseModal}
-        />
-      )}
-      <div>
-        <h4 className="px-6 py-3 bg-gray-50 text-left text-xl leading-4 font-bold text-gray-500 uppercase tracking-wider rounded-md">
-          {role === "admin" ? "Reports of all residents" : "Your Reports"}
-        </h4>
-      </div>
-      <div className="max-h-[450px] overflow-y-auto">
-        <table className="w-full bg-gray-200 shadow-md rounded-lg">
-          <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
-            <tr>
-              <th className="px-6 py-3 bg-gray-50 text-left">Username</th>
-              <th className="px-6 py-3 bg-gray-50 text-left hidden md:table-cell">Image</th>
-              <th className="px-6 py-3 bg-gray-50 text-left hidden md:table-cell">Date</th>
-              <th className="px-6 py-3 bg-gray-50 text-left hidden md:table-cell">State</th>
-              <th className="px-6 py-3 bg-gray-50 text-left">Action</th>
-            </tr>
-          </thead>
-          <tbody className="text-gray-600 text-sm font-light">
-            {filteredAndDateFilteredReports
-              .reverse()
-              .slice(indexOfFirstItem, indexOfLastItem)
-              .map((report, index) => (
-                <tr
-                  key={index}
-                  className="border-b border-gray-200 hover:bg-gray-100"
-                >
-                  <td className="px-6 py-4 whitespace-no-wrap">
-                    {report.createdBy}
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell">
-                    {report.image && (
-                      <img
-                        src={report.image}
-                        alt="Reporte"
-                        className="h-12 w-12 rounded-full"
-                      />
-                    )}
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell">
-                    {new Date(report.incidentDate).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 hidden md:table-cell">
-                    <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getsColorState(
-                        report.state
-                      )}`}
-                    >
-                      {report.state}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="dropdown">
-                      <button
-                        className="btn btn-primary dropdown-toggle"
-                        type="button"
-                        data-bs-toggle="dropdown"
-                        aria-expanded="false"
+        <div className="max-h-[450px] overflow-y-auto">
+          <table className="w-full bg-gray-200 shadow-md rounded-lg">
+            <thead className="bg-gray-200 text-gray-700 uppercase text-xs">
+              <tr>
+                <th className="px-6 py-3 bg-gray-50 text-left">Username</th>
+                <th className="px-6 py-3 bg-gray-50 text-left hidden md:table-cell">Image</th>
+                <th className="px-6 py-3 bg-gray-50 text-left hidden md:table-cell">Date</th>
+                <th className="px-6 py-3 bg-gray-50 text-left hidden md:table-cell">State</th>
+                <th className="px-6 py-3 bg-gray-50 text-left">Action</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-600 text-sm font-light">
+              {filteredAndDateFilteredReports
+                .reverse()
+                .slice(indexOfFirstItem, indexOfLastItem)
+                .map((report, index) => (
+                  <tr
+                    key={index}
+                    className="border-b border-gray-200 hover:bg-gray-100"
+                  >
+                    <td className="px-6 py-4 whitespace-no-wrap">
+                      {report.createdBy}
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell">
+                      {report.image && (
+                        <img
+                          src={report.image}
+                          alt="Reporte"
+                          className="h-12 w-12 rounded-full"
+                        />
+                      )}
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell">
+                      {new Date(report.incidentDate).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell">
+                      <span
+                        className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${getsColorState(
+                          report.state
+                        )}`}
                       >
-                        Action
-                      </button>
-                      <ul className="dropdown-menu">
-                        <li>
-                          <button
-                            className="dropdown-item flex gap-2"
-                            type="button"
-                            onClick={() => handleView(report)}
-                          >
-                            <TbEyeSearch className="text-xl" />
-                            See report
-                          </button>
-                        </li>
-                        <li>
-                          <hr className="dropdown-divider" />
-                        </li>
-                        <li>
-                          <button
-                            className="dropdown-item flex gap-2 text-red-500"
-                            type="button"
-                            onClick={() => handleDelete(report._id)}
-                          >
-                            <TbReportOff className="text-xl text-red-300" />
-                            Delete
-                          </button>
-                        </li>
-                        <li>
-                          <hr className="dropdown-divider" />
-                        </li>
-                        <li>
-                          <button
-                            className="dropdown-item flex gap-2"
-                            type="button"
-                          >
-                            <TbSend className="text-xl" />
-                            Send to
-                          </button>
-                        </li>
-                      </ul>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
-      <div>
-        <h4 className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
-          In total there are {reports.length} Reports
-        </h4>
-      </div>
-      <div className="flex justify-between mt-2">
-        <div className="flex items-center">
-          <p className="font-medium">Page</p>
-          <div className="text-gray-700 font-bold ml-2 rounded">
-            {currentPage}
-          </div>
-          <span className="text-gray-700 mx-2">of</span>
-          <div className="text-gray-700 font-bold rounded">
-            {Math.ceil(filteredAndDateFilteredReports.length / itemsPerPage)}
-          </div>
+                        {report.state}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="dropdown">
+                        <button
+                          className="btn btn-primary dropdown-toggle"
+                          type="button"
+                          data-bs-toggle="dropdown"
+                          aria-expanded="false"
+                        >
+                          Action
+                        </button>
+                        <ul className="dropdown-menu">
+                          <li>
+                            <button
+                              className="dropdown-item flex gap-2"
+                              type="button"
+                              onClick={() => handleView(report)}
+                            >
+                              <TbEyeSearch className="text-xl" />
+                              See report
+                            </button>
+                          </li>
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+                          <li>
+                            <button
+                              className="dropdown-item flex gap-2 text-red-500"
+                              type="button"
+                              onClick={() => handleDelete(report._id)}
+                            >
+                              <TbReportOff className="text-xl text-red-300" />
+                              Delete
+                            </button>
+                          </li>
+                          <li>
+                            <hr className="dropdown-divider" />
+                          </li>
+                          <li>
+                            <button
+                              className="dropdown-item flex gap-2"
+                              type="button"
+                            >
+                              <TbSend className="text-xl" />
+                              Send to
+                            </button>
+                          </li>
+                        </ul>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
         </div>
-  
-        <div className="space-x-2">
-          <button
-            onClick={() => setCurrentPage(currentPage - 1)}
-            disabled={currentPage === 1}
-            className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
-              currentPage === 1 ? "cursor-not-allowed" : ""
-            }`}
-          >
-            <MdArrowBackIosNew />
-          </button>
-  
-          <button
-            onClick={() => setCurrentPage(currentPage + 1)}
-            disabled={
-              indexOfLastItem >= filteredAndDateFilteredReports.length
-            }
-            className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
-              indexOfLastItem >= filteredAndDateFilteredReports.length
-                ? "cursor-not-allowed"
-                : ""
-            }`}
-          >
-            <MdArrowForwardIos />
-          </button>
+        <div>
+          <h4 className="px-6 py-3 bg-gray-50 text-left text-xs leading-4 font-medium text-gray-500 uppercase tracking-wider">
+            In total there are {reports.length} Reports
+          </h4>
         </div>
-      </div>
-  
-      {selectedReport && (
-        <div className="fixed inset-0 z-10 flex items-center justify-center overflow-x-auto overflow-y-auto outline-none focus:outline-none">
-          <div className="flex justify-center items-center h-screen">
-            <div>
-              <ReportList
-                report={selectedReport}
-                handleStateChange={handleStateChange}
-                handleDelete={handleDelete}
-                handleCloseModal={handleCloseModal}
-                users={users}
-              />
+        <div className="flex justify-between mt-2">
+          <div className="flex items-center">
+            <p className="font-medium">Page</p>
+            <div className="text-gray-700 font-bold ml-2 rounded">
+              {currentPage}
+            </div>
+            <span className="text-gray-700 mx-2">of</span>
+            <div className="text-gray-700 font-bold rounded">
+              {Math.ceil(filteredAndDateFilteredReports.length / itemsPerPage)}
             </div>
           </div>
+
+          <div className="space-x-2">
+            <button
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-l ${
+                currentPage === 1 ? "cursor-not-allowed" : ""
+              }`}
+            >
+              <MdArrowBackIosNew />
+            </button>
+
+            <button
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={
+                indexOfLastItem >= filteredAndDateFilteredReports.length
+              }
+              className={`bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-r ${
+                indexOfLastItem >= filteredAndDateFilteredReports.length
+                  ? "cursor-not-allowed"
+                  : ""
+              }`}
+            >
+              <MdArrowForwardIos />
+            </button>
+          </div>
         </div>
-      )}
-    </div>
-  
-    <Outlet />
-  </>
-  
-  
+
+        {selectedReport && (
+          <div className="fixed inset-0 z-10 flex items-center justify-center overflow-x-auto overflow-y-auto outline-none focus:outline-none">
+            <div className="flex justify-center items-center h-screen">
+              <div>
+                <ReportList
+                  report={selectedReport}
+                  handleStateChange={handleStateChange}
+                  handleDelete={handleDelete}
+                  handleCloseModal={handleCloseModal}
+                  users={users}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Outlet />
+    </>
   );
 };
 
